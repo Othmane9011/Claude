@@ -2045,22 +2045,20 @@ final hay = [
   }
 
   /// Créer une commande (client)
+  /// Note: Backend DTO only accepts providerId and items (productId, quantity)
   Future<Map<String, dynamic>> createPetshopOrder({
     required String providerId,
-    required List<Map<String, dynamic>> items, // [{productId: String, quantity: int, priceDa: int}]
-    String? deliveryAddress,
-    String? notes,
-    String? phone,
-    int? totalDa,
+    required List<Map<String, dynamic>> items, // [{productId: String, quantity: int}]
+    String? deliveryAddress, // Not used by current backend
+    String? notes, // Not used by current backend
+    String? phone, // Not used by current backend
+    int? totalDa, // Not used by current backend - calculated server-side
   }) async {
     await ensureAuth();
+    // Backend CreateOrderDto only accepts providerId and items
     final body = {
       'providerId': providerId,
       'items': items,
-      if (deliveryAddress != null && deliveryAddress.isNotEmpty) 'deliveryAddress': deliveryAddress,
-      if (notes != null && notes.isNotEmpty) 'notes': notes,
-      if (phone != null && phone.isNotEmpty) 'phone': phone,
-      if (totalDa != null) 'totalDa': totalDa,
     };
     final paths = <String>[
       '/petshop/orders',
