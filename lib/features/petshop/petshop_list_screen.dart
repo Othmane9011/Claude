@@ -169,16 +169,6 @@ class PetshopListScreen extends ConsumerStatefulWidget {
 
 class _PetshopListScreenState extends ConsumerState<PetshopListScreen> {
   String _searchQuery = '';
-  String _selectedCategory = 'Tous';
-
-  final _categories = [
-    'Tous',
-    'Alimentation',
-    'Accessoires',
-    'Hygiene',
-    'Jouets',
-    'Medicaments',
-  ];
 
   @override
   void initState() {
@@ -334,39 +324,6 @@ class _PetshopListScreenState extends ConsumerState<PetshopListScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(color: _coral, width: 2),
               ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Category chips
-          SizedBox(
-            height: 36,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: _categories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (_, i) {
-                final cat = _categories[i];
-                final isSelected = cat == _selectedCategory;
-                return FilterChip(
-                  label: Text(cat),
-                  selected: isSelected,
-                  onSelected: (_) => setState(() => _selectedCategory = cat),
-                  selectedColor: _coral,
-                  backgroundColor: _coralSoft,
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : _coral,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  side: BorderSide.none,
-                  showCheckmark: false,
-                );
-              },
             ),
           ),
         ],
