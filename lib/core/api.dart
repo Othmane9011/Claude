@@ -928,7 +928,7 @@ Future<List<Map<String, dynamic>>> providerAgenda({
           if (neuteredAtIso != null) 'neuteredAt': _isoDateOrUtcMidnight(neuteredAtIso),
           if (birthDateIso != null) 'birthDate': _isoDateOrUtcMidnight(birthDateIso),
           if (microchipNumber != null) 'microchipNumber': microchipNumber,
-          if (allergies != null) 'allergies': allergies,
+          if (allergies != null) 'allergiesNotes': allergies,
           if (description != null) 'description': description,
           if (withPhoto && photoUrl != null && photoUrl.isNotEmpty) 'photoUrl': photoUrl,
         };
@@ -994,7 +994,7 @@ Future<List<Map<String, dynamic>>> providerAgenda({
       if (neuteredAtIso != null) 'neuteredAt': _isoDateOrUtcMidnight(neuteredAtIso),
       if (birthDateIso != null) 'birthDate': _isoDateOrUtcMidnight(birthDateIso),
       if (microchipNumber != null) 'microchipNumber': microchipNumber,
-      if (allergies != null) 'allergies': allergies,
+      if (allergies != null) 'allergiesNotes': allergies,
       if (description != null) 'description': description,
       if (country != null) 'country': country,
       if (idNumber != null) 'idNumber': idNumber,

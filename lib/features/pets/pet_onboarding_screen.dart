@@ -60,7 +60,7 @@ class _PetOnboardingScreenState extends ConsumerState<PetOnboardingScreen> {
     _city.text = pet['country'] ?? '';
     _breed.text = pet['breed'] ?? '';
     _microchip.text = pet['microchipNumber'] ?? '';
-    _allergies.text = pet['allergies'] ?? '';
+    _allergies.text = pet['allergiesNotes'] ?? '';
     _notes.text = pet['description'] ?? '';
     _animalType = pet['idNumber'];
     _existingPhotoUrl = pet['photoUrl'];
