@@ -13,7 +13,7 @@ class CartItem {
   final int priceDa; // Prix unitaire avec commission incluse
   final int quantity;
   final String? imageUrl;
-  final int? stock; // Stock disponible (optionnel)
+  final int stock; // Stock disponible (9999 = illimité)
 
   CartItem({
     required this.productId,
@@ -23,7 +23,7 @@ class CartItem {
     required this.priceDa,
     required this.quantity,
     this.imageUrl,
-    this.stock,
+    this.stock = 9999, // Default: stock illimité
   });
 
   /// Total pour cet item (prix * quantité)
