@@ -59,6 +59,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       for (final entry in itemsByProvider.entries) {
         final providerId = entry.key;
         final items = notifier.toApiItems(providerId);
+        final total = notifier.totalForProvider(providerId);
 
         final result = await api.createPetshopOrder(
           providerId: providerId,
@@ -66,6 +67,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           deliveryAddress: _addressController.text.trim(),
           notes: _notesController.text.trim(),
           phone: _phoneController.text.trim(),
+          totalDa: total,
         );
 
         final orderId = result['id']?.toString() ?? '';
@@ -432,30 +434,39 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
           const Divider(height: 24),
 
-          _buildSummaryRow('Sous-total', _da(cart.subtotalDa)),
-          const SizedBox(height: 8),
-          _buildSummaryRow('Frais de service', _da(cart.commissionDa)),
+          _buildSummaryRow('Total', _da(cart.subtotalDa), isBold: true),
+          const SizedBox(height: 4),
+          Text(
+            '(+ frais de livraison a convenir avec le vendeur)',
+            style: TextStyle(
+              color: Colors.grey.shade500,
+              fontSize: 11,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryRow(String label, String value) {
+  Widget _buildSummaryRow(String label, String value, {bool isBold = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 13,
+            color: isBold ? _ink : Colors.grey.shade600,
+            fontSize: isBold ? 15 : 13,
+            fontWeight: isBold ? FontWeight.w700 : FontWeight.normal,
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
+          style: TextStyle(
+            fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
+            fontSize: isBold ? 16 : 13,
+            color: isBold ? _coral : _ink,
           ),
         ),
       ],
@@ -493,7 +504,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    _da(cart.totalDa),
+                    _da(cart.subtotalDa),
                     style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 22,

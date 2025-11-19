@@ -252,6 +252,88 @@ class _PetshopSettingsScreenState extends ConsumerState<PetshopSettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$label copie')));
   }
 
+  void _showPreviewDialog() {
+    final fullName = '${_firstName.text.trim()} ${_lastName.text.trim()}'.trim();
+    final display = fullName.isEmpty ? 'Ma Boutique' : fullName;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: _primarySoft,
+              backgroundImage:
+                  _photoUrl.text.trim().isEmpty ? null : NetworkImage(_photoUrl.text.trim()),
+              child: _photoUrl.text.trim().isEmpty
+                  ? Text(display[0].toUpperCase(),
+                      style: const TextStyle(fontWeight: FontWeight.w800, color: _primary))
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(display, style: const TextStyle(fontSize: 16)),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_address.text.trim().isNotEmpty) ...[
+              Row(
+                children: [
+                  const Icon(Icons.location_on, size: 16, color: _muted),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(_address.text.trim(), style: const TextStyle(fontSize: 13)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+            ],
+            if (_bio.text.trim().isNotEmpty) ...[
+              Text(
+                _bio.text.trim(),
+                style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+              ),
+              const SizedBox(height: 8),
+            ],
+            const Divider(),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(_visible ? Icons.visibility : Icons.visibility_off,
+                    size: 16, color: _visible ? Colors.green : Colors.orange),
+                const SizedBox(width: 8),
+                Text(
+                  _visible ? 'Visible par les clients' : 'Non visible',
+                  style: TextStyle(
+                    color: _visible ? Colors.green : Colors.orange,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Produits: $_productCount',
+              style: const TextStyle(fontSize: 12, color: _muted),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -503,9 +585,9 @@ class _PetshopSettingsScreenState extends ConsumerState<PetshopSettingsScreen> {
               const SizedBox(width: 8),
               if (_providerId != null && _providerId!.isNotEmpty)
                 OutlinedButton.icon(
-                  onPressed: () => context.push('/explore/petshop/$_providerId'),
-                  icon: const Icon(Icons.open_in_new),
-                  label: const Text('Voir'),
+                  onPressed: () => _showPreviewDialog(),
+                  icon: const Icon(Icons.visibility),
+                  label: const Text('Apercu'),
                 ),
             ],
           ),

@@ -2047,10 +2047,11 @@ final hay = [
   /// Créer une commande (client)
   Future<Map<String, dynamic>> createPetshopOrder({
     required String providerId,
-    required List<Map<String, dynamic>> items, // [{productId: String, quantity: int}]
+    required List<Map<String, dynamic>> items, // [{productId: String, quantity: int, priceDa: int}]
     String? deliveryAddress,
     String? notes,
     String? phone,
+    int? totalDa,
   }) async {
     await ensureAuth();
     final body = {
@@ -2059,6 +2060,7 @@ final hay = [
       if (deliveryAddress != null && deliveryAddress.isNotEmpty) 'deliveryAddress': deliveryAddress,
       if (notes != null && notes.isNotEmpty) 'notes': notes,
       if (phone != null && phone.isNotEmpty) 'phone': phone,
+      if (totalDa != null) 'totalDa': totalDa,
     };
     final paths = <String>[
       '/petshop/orders',

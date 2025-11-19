@@ -473,7 +473,6 @@ class _ActionGrid extends StatelessWidget {
     final items = [
       _Action('Produits', Icons.inventory_2, '/petshop/products', const Color(0xFF3A86FF)),
       _Action('Commandes', Icons.receipt_long, '/petshop/orders', const Color(0xFFFF6D00)),
-      _Action('Horaires', Icons.schedule, '/petshop/availability', const Color(0xFF7B2CBF)),
       _Action('Parametres', Icons.settings, '/petshop/settings', const Color(0xFF1F7A8C)),
     ];
 

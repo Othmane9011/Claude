@@ -160,8 +160,16 @@ class CartNotifier extends StateNotifier<CartState> {
         .map((i) => {
               'productId': i.productId,
               'quantity': i.quantity,
+              'priceDa': i.priceDa,
             })
         .toList();
+  }
+
+  /// Total pour un provider donné
+  int totalForProvider(String providerId) {
+    return state.items
+        .where((i) => i.providerId == providerId)
+        .fold(0, (sum, item) => sum + (item.priceDa * item.quantity));
   }
 
   void clear() {
