@@ -2047,20 +2047,19 @@ final hay = [
   /// Créer une commande (client)
   Future<Map<String, dynamic>> createPetshopOrder({
     required String providerId,
-    required List<Map<String, dynamic>> items, // [{productId: String, quantity: int, priceDa: int}]
+    required List<Map<String, dynamic>> items, // [{productId: String, quantity: int}]
     String? deliveryAddress,
     String? notes,
     String? phone,
-    int? totalDa,
+    int? totalDa, // Not used - calculated server-side
   }) async {
     await ensureAuth();
     final body = {
       'providerId': providerId,
       'items': items,
+      if (phone != null && phone.isNotEmpty) 'phone': phone,
       if (deliveryAddress != null && deliveryAddress.isNotEmpty) 'deliveryAddress': deliveryAddress,
       if (notes != null && notes.isNotEmpty) 'notes': notes,
-      if (phone != null && phone.isNotEmpty) 'phone': phone,
-      if (totalDa != null) 'totalDa': totalDa,
     };
     final paths = <String>[
       '/petshop/orders',
