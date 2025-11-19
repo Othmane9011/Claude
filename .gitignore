@@ -1,0 +1,56 @@
+# -----------------------------
+# Flutter / Dart standard ignores
+# -----------------------------
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+
+# -----------------------------
+# IntelliJ / VSCode / IDE files
+# -----------------------------
+.idea/
+.vscode/
+*.iml
+*.log
+
+# -----------------------------
+# OS files
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Generated build artifacts / heavy files
+# -----------------------------
+# Flutter build outputs
+build/
+**/build/
+*.apk
+*.aab
+*.so
+*.dill
+*.jar
+*.keystore
+
+# iOS derived data
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/App.framework
+ios/Flutter/Flutter.podspec
+
+# Android Gradle / local files
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# -----------------------------
+# Secrets (if any)
+# -----------------------------
+*.env

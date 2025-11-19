@@ -1,0 +1,424 @@
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateAdoptPostDto } from './dto/create-adopt-post.dto';
+import { UpdateAdoptPostDto } from './dto/update-adopt-post.dto';
+import { FeedQueryDto } from './dto/feed.dto';
+import { SwipeDto, SwipeAction } from './dto/swipe.dto';
+import { AdoptStatus, Prisma, Sex } from '@prisma/client';
+import { bboxFromCenter, clampLat, clampLng, haversineKm, parseLatLngFromGoogleUrl } from './geo.util';
+
+type ImgLike = { id?: string; url?: string; width?: number | null; height?: number | null; order?: number };
+
+@Injectable()
+export class AdoptService {
+  constructor(private prisma: PrismaService) {}
+
+  // ---------- Helpers ----------
+  private getUserId(user: any): string | null {
+    // Accept multiple shapes coming from different auth strategies or legacy JWT payloads
+    return user?.id ?? user?.userId ?? user?.sub ?? user?.payload?.sub ?? user?.payload?.id ?? null;
+  }
+
+  private requireUserId(user: any): string {
+    const id = this.getUserId(user);
+    if (!id) throw new ForbiddenException('Unauthorized');
+    return id;
+  }
+
+  private assertOwnerOrAdmin(user: any, post: { createdById: string }) {
+    const userId = this.requireUserId(user);
+    if (user.role === 'ADMIN') return;
+    if (userId !== post.createdById) throw new ForbiddenException('Forbidden');
+  }
+
+  private normalizeGeo(input: { lat?: number; lng?: number; mapsUrl?: string }) {
+    let lat = clampLat(input.lat);
+    let lng = clampLng(input.lng);
+    if ((lat == null || lng == null) && input.mapsUrl) {
+      const p = parseLatLngFromGoogleUrl(input.mapsUrl);
+      lat = clampLat(p.lat);
+      lng = clampLng(p.lng);
+    }
+    return { lat, lng };
+  }
+
+  private asSex(v: unknown): Sex | undefined {
+    if (v == null) return undefined;
+    const s = String(v).toUpperCase();
+    if (s === 'M') return Sex.M;
+    if (s === 'F') return Sex.F;
+    if (s === 'U') return Sex.U;
+    return undefined;
+  }
+
+  private toPublicImages(images: unknown): { id: string; url: string; width: number | null; height: number | null; order: number }[] {
+    const arr = (Array.isArray(images) ? (images as ImgLike[]) : []) as ImgLike[];
+    return arr
+@@ -59,86 +70,114 @@ export class AdoptService {
+      id: post.id,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      status: post.status,
+      title: post.title,
+      description: post.description,
+      species: post.species,
+      sex: post.sex,
+      ageMonths: post.ageMonths,
+      size: post.size,
+      color: post.color,
+      city: post.city,
+      address: post.address,
+      mapsUrl: post.mapsUrl,
+      lat: post.lat,
+      lng: post.lng,
+      createdById: post.createdById,
+      images: this.toPublicImages(post.images),
+    };
+    if (center && post.lat != null && post.lng != null) {
+      out.distance_km = Number(haversineKm(center.lat, center.lng, post.lat, post.lng).toFixed(3));
+    }
+    return out;
+  }
+
+  private pickAdmin(post: any, center?: { lat: number; lng: number }) {
+    const base = this.pickPublic(post, center);
+    return {
+      ...base,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      approvedAt: post.approvedAt,
+      rejectedAt: post.rejectedAt,
+      archivedAt: post.archivedAt,
+      moderationNote: post.moderationNote ?? null,
+      createdBy: post.createdBy
+        ? {
+            id: post.createdBy.id,
+            firstName: post.createdBy.firstName ?? null,
+            lastName: post.createdBy.lastName ?? null,
+            // rétrocompatibilité avec l'ancien front
+            firstname: post.createdBy.firstName ?? post.createdBy.firstname ?? null,
+            lastname: post.createdBy.lastName ?? post.createdBy.lastname ?? null,
+            email: post.createdBy.email,
+            phone: post.createdBy.phone ?? null,
+            role: post.createdBy.role,
+          }
+        : null,
+    };
+  }
+
+  // ---------- CRUD ----------
+  async create(user: any, dto: CreateAdoptPostDto) {
+    const { lat, lng } = this.normalizeGeo(dto);
+    const userId = this.requireUserId(user);
+    const images = (dto.images ?? []).slice(0, 6).map((i: any, idx: number) => ({
+      url: i.url,
+      width: i.width ?? null,
+      height: i.height ?? null,
+      order: i.order ?? idx,
+    }));
+
+    const post = await this.prisma.adoptPost.create({
+      data: {
+        title: dto.title,
+        description: dto.description ?? null,
+        species: dto.species,
+        sex: this.asSex(dto.sex), // <-- enum Prisma
+        ageMonths: dto.ageMonths ?? null,
+        size: dto.size ?? null,
+        color: dto.color ?? null,
+        city: dto.city ?? null,
+        address: dto.address ?? null,
+        mapsUrl: dto.mapsUrl ?? null,
+        lat: lat ?? null,
+        lng: lng ?? null,
+        createdById: userId,
+        status: AdoptStatus.PENDING,
+        images: { create: images },
+      },
+      include: { images: true },
+    });
+
+    // TODO: notify admin moderation queue
+    return this.pickPublic(post);
+  }
+
+  async update(user: any, id: string, dto: UpdateAdoptPostDto) {
+    this.requireUserId(user);
+    const existing = await this.prisma.adoptPost.findUnique({ where: { id }, include: { images: true } });
+    if (!existing) throw new NotFoundException('Post not found');
+    this.assertOwnerOrAdmin(user, existing);
+
+    const { lat, lng } = this.normalizeGeo(dto);
+    const maybeSex = this.asSex(dto.sex);
+
+    const data: any = {
+      title: dto.title ?? existing.title,
+      description: dto.description ?? existing.description,
+      species: dto.species ?? existing.species,
+      sex: maybeSex ?? existing.sex, // garder enum
+      ageMonths: dto.ageMonths ?? existing.ageMonths,
+      size: dto.size ?? existing.size,
+      color: dto.color ?? existing.color,
+      city: dto.city ?? existing.city,
+      address: dto.address ?? existing.address,
+      mapsUrl: dto.mapsUrl ?? existing.mapsUrl,
+      lat: lat ?? existing.lat,
+      lng: lng ?? existing.lng,
+    };
+
+    // Si l’owner modifie un champ "substantiel" et que le post était APPROVED → repasse en PENDING
+    const substantial =
+      dto.title ?? dto.description ?? dto.species ?? dto.sex ?? dto.ageMonths ??
+@@ -153,165 +192,252 @@ export class AdoptService {
+    // Images (remplacement complet si fourni)
+    let imagesOut = existing.images;
+    if (dto.images) {
+      await this.prisma.adoptImage.deleteMany({ where: { postId: id } });
+      const imgs = dto.images.slice(0, 6).map((i: any, idx: number) => ({
+        url: i.url,
+        width: i.width ?? null,
+        height: i.height ?? null,
+        order: i.order ?? idx,
+        postId: id,
+      }));
+      await this.prisma.adoptImage.createMany({ data: imgs });
+      imagesOut = await this.prisma.adoptImage.findMany({ where: { postId: id } });
+    }
+
+    const post = await this.prisma.adoptPost.update({
+      where: { id },
+      data,
+      include: { images: true },
+    });
+
+    return this.pickPublic({ ...post, images: imagesOut });
+  }
+
+  async remove(user: any, id: string) {
+    this.requireUserId(user);
+    const existing = await this.prisma.adoptPost.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Post not found');
+    this.assertOwnerOrAdmin(user, existing);
+
+    // Archivage (soft-delete)
+    const post = await this.prisma.adoptPost.update({
+      where: { id },
+      data: { status: AdoptStatus.ARCHIVED, archivedAt: new Date() },
+      include: { images: true },
+    });
+    return this.pickPublic(post);
+  }
+
+  async getPublic(id: string) {
+    const post = await this.prisma.adoptPost.findUnique({
+      where: { id },
+      include: { images: true },
+    });
+    if (!post || post.status === AdoptStatus.ARCHIVED) throw new NotFoundException('Post not found');
+    // NB: autoriser lecture PENDING/REJECTED par owner/admin via contrôleur user/admin, pas ici
+    if (post.status !== AdoptStatus.APPROVED) throw new NotFoundException('Post not found');
+    return this.pickPublic(post);
+  }
+
+  async listMine(user: any) {
+    const userId = this.requireUserId(user);
+    const rows = await this.prisma.adoptPost.findMany({
+      where: { createdById: userId },
+      orderBy: { updatedAt: 'desc' },
+      include: { images: true },
+    });
+    return rows.map((r) => this.pickPublic(r));
+  }
+
+  // ---------- Feed ----------
+  async feed(user: any | null, q: FeedQueryDto) {
+    const limit = q.limit ?? 20;
+
+    const where: any = { status: AdoptStatus.APPROVED };
+    const and: any[] = [];
+    if (q.species) where.species = q.species;
+    if (q.sex) where.sex = this.asSex(q.sex);
+
+    // Pagination cursor simple par id
+    if (q.cursor) {
+      const cur = await this.prisma.adoptPost.findUnique({ where: { id: q.cursor } });
+      if (cur) {
+        and.push({ createdAt: { lte: cur.createdAt } });
+        and.push({ id: { not: q.cursor } });
+      }
+    }
+
+    // Bounding-box si lat/lng
+    if (q.lat != null && q.lng != null) {
+      const lat = Number(q.lat), lng = Number(q.lng);
+      const bb = bboxFromCenter(lat, lng, q.radiusKm ?? 40000);
+      and.push({ lat: { gte: bb.minLat, lte: bb.maxLat }, lng: { gte: bb.minLng, lte: bb.maxLng } });
+    }
+
+    // Exclure ses propres posts et ceux déjà swipés pour un flux façon "Tinder"
+    if (user) {
+      const userId = this.getUserId(user);
+      if (userId) {
+        and.push({ createdById: { not: userId } });
+        const seen = await this.prisma.adoptSwipe.findMany({
+          where: { userId },
+          select: { postId: true },
+          orderBy: { updatedAt: 'desc' },
+          take: 500,
+        });
+        const seenIds = seen.map((s) => s.postId);
+        if (seenIds.length) {
+          and.push({ id: { notIn: seenIds } });
+        }
+      }
+    }
+
+    if (and.length) {
+      where.AND = and;
+    }
+
+    const rows = await this.prisma.adoptPost.findMany({
+      where,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      take: limit,
+      include: { images: true },
+    });
+
+    const center = (q.lat != null && q.lng != null) ? { lat: Number(q.lat), lng: Number(q.lng) } : undefined;
+    const data = rows.map((r) => this.pickPublic(r, center));
+
+    // cursor suivant
+    const nextCursor = rows.length === limit ? rows[rows.length - 1].id : null;
+
+    return { data, nextCursor };
+  }
+
+  // ---------- Swipe ----------
+  async swipe(user: any, postId: string, dto: SwipeDto) {
+    const userId = this.requireUserId(user);
+    const post = await this.prisma.adoptPost.findUnique({ where: { id: postId } });
+    if (!post || post.status !== AdoptStatus.APPROVED) throw new NotFoundException('Post not found');
+    if (post.createdById === userId) throw new ForbiddenException('Cannot swipe own post');
+
+    const rec = await this.prisma.adoptSwipe.upsert({
+      where: { userId_postId: { userId, postId } },
+      create: { userId, postId, action: dto.action },
+      update: { action: dto.action },
+    });
+
+    // TODO: notify post.owner on LIKE (queue)
+    return { ok: true, action: rec.action };
+  }
+
+  async myLikes(user: any) {
+    const userId = this.requireUserId(user);
+    const rows = await this.prisma.adoptSwipe.findMany({
+      where: { userId, action: SwipeAction.LIKE },
+      orderBy: { createdAt: 'desc' },
+      include: { post: { include: { images: true } } },
+    });
+    return rows
+      .filter((r) => r.post && r.post.status !== AdoptStatus.ARCHIVED)
+      .map((r) => this.pickPublic(r.post));
+  }
+
+  // Swipes "LIKE" reçus sur mes annonces approuvées
+  async incomingRequests(user: any) {
+    const userId = this.requireUserId(user);
+    type IncomingLike = Prisma.AdoptSwipeGetPayload<{
+      include: {
+        post: { include: { images: true } };
+        user: { select: { id: true; firstName: true; lastName: true; photoUrl: true } };
+      };
+    }>;
+
+    const rows: IncomingLike[] = await this.prisma.adoptSwipe.findMany({
+      where: {
+        action: SwipeAction.LIKE,
+        post: { createdById: userId, status: AdoptStatus.APPROVED },
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        post: { include: { images: true } },
+        user: { select: { id: true, firstName: true, lastName: true, photoUrl: true } },
+      },
+      take: 200,
+    });
+
+    return rows
+      .filter((r) => r.post)
+      .map((r) => ({
+        id: r.id,
+        likedAt: r.createdAt,
+        liker: r.user,
+        post: this.pickPublic(r.post!),
+      }));
+  }
+
+  // ---------- Admin ----------
+  async adminList(status?: AdoptStatus, limit = 30, cursor?: string) {
+    const where: any = {};
+    if (status) where.status = status;
+
+    const and: any[] = [];
+    if (cursor) {
+      const cur = await this.prisma.adoptPost.findUnique({ where: { id: cursor } });
+      if (cur) {
+        and.push({ createdAt: { lte: cur.createdAt } });
+        and.push({ id: { not: cursor } });
+      }
+    }
+    if (and.length) where.AND = and;
+
+    const [rows, grouped] = await Promise.all([
+      this.prisma.adoptPost.findMany({
+        where,
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take: limit,
+        include: { images: true, createdBy: true },
+      }),
+      this.prisma.adoptPost.groupBy({ by: ['status'], _count: true }),
+    ]);
+
+    const nextCursor = rows.length === limit ? rows[rows.length - 1].id : null;
+    const counts: Record<string, number> = { PENDING: 0, APPROVED: 0, REJECTED: 0, ARCHIVED: 0 };
+    grouped.forEach((g) => {
+      counts[g.status] = g._count;
+    });
+
+    return {
+      data: rows.map((r) => this.pickAdmin(r)),
+      nextCursor,
+      counts,
+    };
+  }
+
+  async adminApprove(_admin: any, id: string) {
+    const post = await this.prisma.adoptPost.update({
+      where: { id },
+      data: { status: AdoptStatus.APPROVED, approvedAt: new Date(), moderationNote: null, rejectedAt: null },
+      include: { images: true, createdBy: true },
+    });
+    // TODO: notify owner (queue)
+    return this.pickAdmin(post);
+  }
+
+  async adminReject(_admin: any, id: string, note?: string) {
+    const post = await this.prisma.adoptPost.update({
+      where: { id },
+      data: { status: AdoptStatus.REJECTED, rejectedAt: new Date(), moderationNote: note ?? null, approvedAt: null },
+      include: { images: true, createdBy: true },
+    });
+    // TODO: notify owner (queue)
+    return this.pickAdmin(post);
+  }
+
+  async adminArchive(_admin: any, id: string) {
+    const post = await this.prisma.adoptPost.update({
+      where: { id },
+      data: { status: AdoptStatus.ARCHIVED, archivedAt: new Date() },
+      include: { images: true, createdBy: true },
+    });
+    return this.pickAdmin(post);
+  }
+}

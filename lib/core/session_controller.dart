@@ -1,0 +1,86 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'api.dart';
+
+class SessionState {
+  final Map<String, dynamic>? user; // { id, email, role, ... }
+  final bool loading;
+  final String? error;
+
+  const SessionState({this.user, this.loading = false, this.error});
+
+  SessionState copyWith({
+    Map<String, dynamic>? user,
+    bool? loading,
+    String? error,
+  }) =>
+      SessionState(
+        user: user ?? this.user,
+        loading: loading ?? this.loading,
+        error: error,
+      );
+}
+
+class SessionController extends Notifier<SessionState> {
+  @override
+  SessionState build() {
+    Future.microtask(bootstrap);
+    return const SessionState();
+  }
+
+  Future<void> bootstrap() async {
+    final api = ref.read(apiProvider);
+    final token = await api.getStoredToken();
+    if (token != null && token.isNotEmpty) {
+      await api.setToken(token);
+      try {
+        final me = await api.me();
+        state = state.copyWith(user: me);
+      } catch (_) {
+        // token invalide — rester déconnecté
+      }
+    }
+  }
+
+  Future<bool> login(String email, String password) async {
+    state = state.copyWith(loading: true, error: null);
+    try {
+      await ref.read(apiProvider).login(email: email, password: password);
+      final me = await ref.read(apiProvider).me();
+      state = state.copyWith(user: me, loading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(loading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  /// Inscription puis login immédiat (pour que les écrans suivants aient un token)
+  Future<bool> register(String email, String password) async {
+    state = state.copyWith(loading: true, error: null);
+    try {
+      await ref.read(apiProvider).register(email: email, password: password);
+      await ref.read(apiProvider).login(email: email, password: password);
+      final me = await ref.read(apiProvider).me();
+      state = state.copyWith(user: me, loading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(loading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  Future<void> refreshMe() async {
+    try {
+      final me = await ref.read(apiProvider).me();
+      state = state.copyWith(user: me);
+    } catch (_) {}
+  }
+
+  Future<void> logout() async {
+    await ref.read(apiProvider).setToken(null);
+    state = const SessionState();
+  }
+}
+
+final sessionProvider =
+    NotifierProvider<SessionController, SessionState>(SessionController.new);
