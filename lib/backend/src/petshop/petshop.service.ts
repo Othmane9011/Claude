@@ -9,6 +9,11 @@ export class PetshopService {
   constructor(private readonly prisma: PrismaService) {}
 
   private async getProviderIdForUser(userId: string) {
+    // Validation: userId doit être défini
+    if (!userId) {
+      throw new BadRequestException('User ID is missing. Please ensure you are authenticated.');
+    }
+
     const prov = await this.prisma.providerProfile.findUnique({
       where: { userId },
       select: { id: true, specialties: true },
