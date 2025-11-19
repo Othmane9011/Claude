@@ -38,6 +38,8 @@ export class PetsService {
       isNeutered: dto.isNeutered ?? false,
       neuteredAt: dto.neuteredAt ? new Date(dto.neuteredAt) : null,
       photoUrl: dto.photoUrl ?? null,
+      allergiesNotes: dto.allergiesNotes ?? null,
+      description: dto.description ?? null,
       ownerId, // <- ici on force
     };
     return this.prisma.pet.create({ data });
@@ -60,6 +62,8 @@ export class PetsService {
       breed: dto.breed ?? pet.breed,
       bloodType: dto.bloodType ?? pet.bloodType,
       photoUrl: dto.photoUrl ?? pet.photoUrl,
+      allergiesNotes: dto.allergiesNotes ?? pet.allergiesNotes,
+      description: dto.description ?? pet.description,
     };
     if (dto.birthDate !== undefined) {
       data.birthDate = dto.birthDate ? new Date(dto.birthDate) : null;

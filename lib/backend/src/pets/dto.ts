@@ -31,6 +31,18 @@ export class CreatePetDto {
   @ApiPropertyOptional() @IsOptional() @IsISO8601()
   neuteredAt?: string; // string ISO en entrée
 
+  @ApiPropertyOptional() @IsOptional() @IsISO8601()
+  birthDate?: string; // Date de naissance ISO
+
+  @ApiPropertyOptional() @IsOptional() @IsString()
+  microchipNumber?: string; // Numéro de puce électronique
+
+  @ApiPropertyOptional() @IsOptional() @IsString()
+  allergiesNotes?: string; // Notes sur les allergies
+
+  @ApiPropertyOptional() @IsOptional() @IsString()
+  description?: string; // Description/notes générales
+
   @ApiPropertyOptional() @IsOptional() @IsUrl()
   photoUrl?: string;
 }

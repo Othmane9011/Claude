@@ -213,6 +213,8 @@ model Pet {
   isNeutered      Boolean   @default(false)
   neuteredAt      DateTime?
   photoUrl        String?
+  allergiesNotes  String?   // Notes rapides sur les allergies
+  description     String?   // Description/notes générales
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
