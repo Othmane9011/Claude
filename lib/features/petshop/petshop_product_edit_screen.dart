@@ -81,7 +81,7 @@ class _PetshopProductEditScreenState
     try {
       final api = ref.read(apiProvider);
       for (final file in _localImages) {
-        final url = await api.uploadLocalFile(file);
+        final url = await api.uploadLocalFile(file, folder: 'products');
         _imageUrls.add(url);
       }
       _localImages.clear();
