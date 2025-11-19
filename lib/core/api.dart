@@ -1106,7 +1106,7 @@ Future<List<Map<String, dynamic>>> providerAgenda({
   Future<List<dynamic>> getWeightRecords(String petId) async {
     await ensureAuth();
     final res = await _dio.get('/pets/$petId/weight-records');
-    return _unwrapList(res.data);
+    return _unwrap<List<dynamic>>(res.data, map: (d) => (d as List).cast<dynamic>());
   }
 
   Future<Map<String, dynamic>> createWeightRecord(
@@ -1135,7 +1135,7 @@ Future<List<Map<String, dynamic>>> providerAgenda({
   Future<List<dynamic>> getVaccinations(String petId) async {
     await ensureAuth();
     final res = await _dio.get('/pets/$petId/vaccinations');
-    return _unwrapList(res.data);
+    return _unwrap<List<dynamic>>(res.data, map: (d) => (d as List).cast<dynamic>());
   }
 
   Future<Map<String, dynamic>> createVaccination(
@@ -1172,7 +1172,7 @@ Future<List<Map<String, dynamic>>> providerAgenda({
   Future<List<dynamic>> getTreatments(String petId) async {
     await ensureAuth();
     final res = await _dio.get('/pets/$petId/treatments');
-    return _unwrapList(res.data);
+    return _unwrap<List<dynamic>>(res.data, map: (d) => (d as List).cast<dynamic>());
   }
 
   Future<Map<String, dynamic>> createTreatment(
@@ -1234,7 +1234,7 @@ Future<List<Map<String, dynamic>>> providerAgenda({
   Future<List<dynamic>> getAllergies(String petId) async {
     await ensureAuth();
     final res = await _dio.get('/pets/$petId/allergies');
-    return _unwrapList(res.data);
+    return _unwrap<List<dynamic>>(res.data, map: (d) => (d as List).cast<dynamic>());
   }
 
   Future<Map<String, dynamic>> createAllergy(
@@ -1265,7 +1265,7 @@ Future<List<Map<String, dynamic>>> providerAgenda({
   Future<List<dynamic>> getPreventiveCare(String petId) async {
     await ensureAuth();
     final res = await _dio.get('/pets/$petId/preventive-care');
-    return _unwrapList(res.data);
+    return _unwrap<List<dynamic>>(res.data, map: (d) => (d as List).cast<dynamic>());
   }
 
   Future<Map<String, dynamic>> createPreventiveCare(
