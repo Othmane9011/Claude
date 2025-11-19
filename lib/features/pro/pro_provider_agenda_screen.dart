@@ -241,7 +241,7 @@ class _ProviderAgendaScreenState extends ConsumerState<ProviderAgendaScreen>
                     controller: _listCtl,
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (_, i) {
                       final m = filtered[i];
                       final id = (m['id'] ?? '').toString();
@@ -294,7 +294,7 @@ class _DayStrip extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
               itemCount: days.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (_, i) {
                 final d = days[i];
                 final isSel = i == index;
@@ -337,7 +337,7 @@ class _StatusFilterBar extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, i) {
           final v = items[i];
           final sel = v == value;
@@ -444,7 +444,7 @@ class _BookingTileState extends ConsumerState<_BookingTile> {
     }
 
     final sc = statusColor(status);
-    final subtle = Colors.black.withOpacity(.7);
+    final subtle = Colors.black.withValues(alpha: 0.7);
 
     return Container(
       decoration: BoxDecoration(
@@ -470,7 +470,7 @@ class _BookingTileState extends ConsumerState<_BookingTile> {
                   child: Text(time, style: const TextStyle(fontWeight: FontWeight.w900)),
                 ),
                 const SizedBox(height: 6),
-                Text(dayTxt, style: TextStyle(fontSize: 12, color: Colors.black.withOpacity(.6))),
+                Text(dayTxt, style: TextStyle(fontSize: 12, color: Colors.black.withValues(alpha: 0.6))),
               ],
             ),
             const SizedBox(width: 12),
@@ -486,7 +486,7 @@ class _BookingTileState extends ConsumerState<_BookingTile> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: sc.withOpacity(.15),
+                          color: sc.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(

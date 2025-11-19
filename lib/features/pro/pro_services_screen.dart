@@ -184,7 +184,7 @@ class _ProServicesScreenState extends ConsumerState<ProServicesScreen>
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
                         sliver: SliverList.separated(
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(height: 10),
                           itemCount: count,
                           itemBuilder: (ctx, i) {
@@ -257,12 +257,12 @@ class _ProServicesScreenState extends ConsumerState<ProServicesScreen>
                                       await ref.read(apiProvider).deleteMyService(id);
                                       _removeLocal(id);
                                       if (!mounted) return;
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(this.context).showSnackBar(
                                         const SnackBar(content: Text('Service supprimé')),
                                       );
                                     } catch (e) {
                                       if (!mounted) return;
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                      ScaffoldMessenger.of(this.context).showSnackBar(
                                         SnackBar(content: Text('Suppression impossible: $e')),
                                       );
                                     }
@@ -444,11 +444,11 @@ class _ServiceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final chips = <Widget>[
       if (durationMin != null)
-        _chip(icon: Icons.schedule, label: '${durationMin} min'),
+        _chip(icon: Icons.schedule, label: '$durationMin min'),
       if (isHome)
         _chip(icon: Icons.home_outlined, label: 'À domicile'),
       if (basePriceDa != null && totalPriceDa != null)
-        _chip(icon: Icons.payments_outlined, label: '${basePriceDa} + $commissionDa = $totalPriceDa DA'),
+        _chip(icon: Icons.payments_outlined, label: '$basePriceDa + $commissionDa = $totalPriceDa DA'),
     ];
 
     return TweenAnimationBuilder<double>(
@@ -718,10 +718,10 @@ class _EditServiceSheetState extends ConsumerState<_EditServiceSheet> {
                                     description: descForApi,
                                   );
                             }
-                            if (mounted) Navigator.pop(context, saved);
+                            if (mounted) Navigator.pop(this.context, saved);
                           } catch (e) {
                             if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                              ScaffoldMessenger.of(this.context).showSnackBar(
                                 SnackBar(content: Text('Erreur: $e')),
                               );
                             }

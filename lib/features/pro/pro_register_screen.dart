@@ -110,7 +110,7 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: color.withOpacity(0.08),
+      color: color.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -119,7 +119,7 @@ class _CategoryCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.25)),
+            border: Border.all(color: color.withValues(alpha: 0.25)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -409,7 +409,7 @@ class _VetWizard3StepsState extends ConsumerState<_VetWizard3Steps> {
     );
   }
 
-  Widget _label(String s) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(s, style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 13)));
+  Widget _label(String s) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(s, style: TextStyle(color: Colors.black.withValues(alpha: 0.6), fontSize: 13)));
 
   Widget _input(
     TextEditingController c, {
@@ -552,7 +552,9 @@ class _DaycareWizard3StepsState extends ConsumerState<_DaycareWizard3Steps> {
             _errPhone = 'Téléphone déjà utilisé';
             _step = 1;
           });
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ce numéro est déjà utilisé.')));
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ce numéro est déjà utilisé.')));
+          }
           return;
         }
         rethrow;
@@ -690,7 +692,7 @@ class _DaycareWizard3StepsState extends ConsumerState<_DaycareWizard3Steps> {
     );
   }
 
-  Widget _label(String s) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(s, style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 13)));
+  Widget _label(String s) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(s, style: TextStyle(color: Colors.black.withValues(alpha: 0.6), fontSize: 13)));
 
   Widget _input(
     TextEditingController c, {
@@ -833,7 +835,9 @@ class _PetshopWizard3StepsState extends ConsumerState<_PetshopWizard3Steps> {
             _errPhone = 'Téléphone déjà utilisé';
             _step = 1;
           });
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ce numéro est déjà utilisé.')));
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ce numéro est déjà utilisé.')));
+          }
           return;
         }
         rethrow;
@@ -971,7 +975,7 @@ class _PetshopWizard3StepsState extends ConsumerState<_PetshopWizard3Steps> {
     );
   }
 
-  Widget _label(String s) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(s, style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 13)));
+  Widget _label(String s) => Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(s, style: TextStyle(color: Colors.black.withValues(alpha: 0.6), fontSize: 13)));
 
   Widget _input(
     TextEditingController c, {

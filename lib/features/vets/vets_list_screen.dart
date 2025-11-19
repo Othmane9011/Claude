@@ -36,7 +36,7 @@ final _vetsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
           // Current position (timeout court)
           try {
             final pos = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.medium,
+              locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
             ).timeout(const Duration(seconds: 2));
             return (lat: pos.latitude, lng: pos.longitude);
           } on TimeoutException {
@@ -77,14 +77,14 @@ final _vetsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
   );
 
   // ---------- 3) Normalisation légère côté client ----------
-  double? _toDouble(dynamic v) {
+  double? toDouble(dynamic v) {
     if (v is num) return v.toDouble();
     if (v is String) return double.tryParse(v);
     return null;
   }
 
-  // Haversine (fallback au cas où le backend n’aurait pas mis distance_km)
-  double? _haversineKm(double? lat, double? lng) {
+  // Haversine (fallback au cas où le backend n'aurait pas mis distance_km)
+  double? haversineKm(double? lat, double? lng) {
     if (lat == null || lng == null) return null;
     const R = 6371.0;
     double toRad(double d) => d * math.pi / 180.0;
@@ -106,13 +106,13 @@ final _vetsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
     final bio = (m['bio'] ?? '').toString();
 
     // distance_km fournie par le backend si centre valide
-    double? dKm = _toDouble(m['distance_km']);
+    double? dKm = toDouble(m['distance_km']);
 
     // Fallback si distance_km manquante: calcule localement avec lat/lng
     if (dKm == null) {
-      final lat = _toDouble(m['lat']);
-      final lng = _toDouble(m['lng']);
-      dKm = _haversineKm(lat, lng);
+      final lat = toDouble(m['lat']);
+      final lng = toDouble(m['lng']);
+      dKm = haversineKm(lat, lng);
     }
 
     return <String, dynamic>{
@@ -191,7 +191,7 @@ class _VetListScreenState extends ConsumerState<VetListScreen> {
             child: ListView.separated(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               itemCount: rows.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 14),
+              separatorBuilder: (_, _) => const SizedBox(height: 14),
               itemBuilder: (_, i) {
                 final m = rows[i];
                 return _VetRow(
@@ -287,7 +287,7 @@ class _VetRow extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             '${distanceKm!.toStringAsFixed(1)} km',
-                            style: TextStyle(color: Colors.black.withOpacity(.7)),
+                            style: TextStyle(color: Colors.black.withValues(alpha: 0.7)),
                           ),
                         ],
                       ],
@@ -300,7 +300,7 @@ class _VetRow extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.black.withOpacity(.7),
+                          color: Colors.black.withValues(alpha: 0.7),
                           height: 1.25,
                         ),
                       ),

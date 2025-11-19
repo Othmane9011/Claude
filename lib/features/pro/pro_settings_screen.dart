@@ -1,5 +1,4 @@
 // lib/features/pro/pro_settings_screen.dart
-import 'dart:ui' show FontFeature;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -137,10 +136,15 @@ class _ProSettingsScreenState extends ConsumerState<ProSettingsScreen> {
       int cConfirmed = 0, cPending = 0, cCancelled = 0, cCompleted = 0;
       for (final e in rows) {
         final st = (e['status'] ?? '').toString().toUpperCase();
-        if (st == 'CONFIRMED') cConfirmed++;
-        else if (st == 'PENDING') cPending++;
-        else if (st == 'CANCELLED' || st == 'CANCELED') cCancelled++;
-        else if (st == 'COMPLETED') cCompleted++;
+        if (st == 'CONFIRMED') {
+          cConfirmed++;
+        } else if (st == 'PENDING') {
+          cPending++;
+        } else if (st == 'CANCELLED' || st == 'CANCELED') {
+          cCancelled++;
+        } else if (st == 'COMPLETED') {
+          cCompleted++;
+        }
       }
       _countConfirmed = cConfirmed;
       _countPending   = cPending;
@@ -260,10 +264,10 @@ Future<void> _toggleVisibility(bool v) async {
 
   @override
   Widget build(BuildContext context) {
-    // Fix global “back”: si pas de pile → /pro/home
+    // Fix global "back": si pas de pile → /pro/home
     return PopScope(
       canPop: true,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
         final nav = Navigator.of(context);
         if (nav.canPop()) {
@@ -505,7 +509,7 @@ Future<void> _toggleVisibility(bool v) async {
               const SizedBox(width: 8),
               if (_providerId != null && _providerId!.isNotEmpty)
                 OutlinedButton.icon(
-                  onPressed: () => context.push('/explore/vets/${_providerId}'),
+                  onPressed: () => context.push('/explore/vets/$_providerId'),
                   icon: const Icon(Icons.open_in_new),
                   label: const Text('Voir le profil'),
                 ),
