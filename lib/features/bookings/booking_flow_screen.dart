@@ -107,8 +107,7 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
   String? _selectedServiceId;
   String? _selectedSlotIso;
 
-  // Infos du service sélectionné (affichées dans l’UI)
-  String _selTitle = '';
+  // Infos du service sélectionné (affichées dans l'UI)
   String _selDesc  = '';
   int    _selDurationMin = 30;
   int?   _selPriceDa;
@@ -118,7 +117,6 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
   String _fmtDa(num v) => NumberFormat.decimalPattern('fr_FR').format(v);
 
   void _applySelectedService(Map<String, dynamic> svc) {
-    _selTitle = (svc['title'] ?? '').toString();
     _selDesc  = (svc['description'] ?? '').toString();
     _selDurationMin = int.tryParse('${svc['durationMin'] ?? ''}') ?? 30;
     final p = svc['price'];

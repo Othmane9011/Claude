@@ -1,5 +1,4 @@
 // lib/features/map/nearby_vets_map_screen.dart
-import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -60,16 +59,16 @@ final allVetsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
     status: 'approved',
   );
 
-  double? _toDouble(dynamic v) {
+  double? toDouble(dynamic v) {
     if (v is num) return v.toDouble();
     if (v is String) return double.tryParse(v);
     return null;
   }
 
   // Fallback Haversine si distance_km absente
-  double? _haversineKm(double? lat, double? lng) {
+  double? haversineKm(double? lat, double? lng) {
     if (lat == null || lng == null) return null;
-    const R = 6371.0;
+    const r = 6371.0;
     double toRad(double d) => d * math.pi / 180.0;
     final dLat = toRad(lat - center.latitude);
     final dLng = toRad(lng - center.longitude);
@@ -77,21 +76,21 @@ final allVetsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
         math.cos(toRad(center.latitude)) * math.cos(toRad(lat)) *
         math.sin(dLng / 2) * math.sin(dLng / 2);
     final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return R * c;
+    return r * c;
   }
 
   // Normalisation
   final rows = raw.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
-  bool _validNum(dynamic v) => v is num && v.isFinite && v != 0;
+  bool validNum(dynamic v) => v is num && v.isFinite && v != 0;
 
   final out = <Map<String, dynamic>>[];
   for (final m in rows) {
-    final lat = _toDouble(m['lat']);
-    final lng = _toDouble(m['lng']);
-    if (!_validNum(lat) || !_validNum(lng)) continue;
+    final lat = toDouble(m['lat']);
+    final lng = toDouble(m['lng']);
+    if (!validNum(lat) || !validNum(lng)) continue;
     m['__lat'] = lat;
     m['__lng'] = lng;
-    m['__distKm'] = _toDouble(m['distance_km']) ?? _haversineKm(lat, lng);
+    m['__distKm'] = toDouble(m['distance_km']) ?? haversineKm(lat, lng);
     out.add(m);
   }
   return out;
@@ -532,12 +531,6 @@ class _ProviderMiniCard extends ConsumerWidget {
     final user = (m['user'] is Map) ? Map<String, dynamic>.from(m['user']) : const {};
     final p2 = (user['photoUrl'] ?? user['avatar'])?.toString();
     return (p2 != null && p2.isNotEmpty) ? p2 : null;
-  }
-
-  String _fmtPrice(dynamic v) {
-    if (v == null) return '—';
-    final n = (v is num) ? v.toInt() : int.tryParse('$v');
-    return (n == null) ? '—' : '$n DA';
   }
 
   @override

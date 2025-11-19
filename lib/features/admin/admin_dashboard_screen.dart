@@ -9,7 +9,6 @@ import '../../core/session_controller.dart';
 
 /// Palette saumon (rose crevette)
 const _salmon = Color(0xFFF36C6C);
-const _salmonDark = Color(0xFFD55858);
 const _salmonSoft = Color(0xFFFFE7E7);
 const _ink = Colors.black87;
 
@@ -139,7 +138,6 @@ Future<void> _openProviderSheet(Map<String, dynamic> p) async {
   final name = (p['displayName'] ?? '') as String;
   final addr = (p['address'] ?? '') as String;
   final approved = (p['isApproved'] == true);
-  final appliedAt = (p['appliedAt'] ?? '').toString();
   final rejectedAt = (p['rejectedAt'] ?? '').toString();
   final specialties = (p['specialties'] as Map?) ?? const {};
   final user = (p['user'] as Map?) ?? const {};
@@ -687,7 +685,7 @@ class _MapPreviewCard extends StatelessWidget {
         height: 180,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.04),
+          color: Colors.black.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(12),
         ),
         child: const Text('Prévisualisation indisponible — coordonnées manquantes'),
@@ -713,7 +711,7 @@ class _MapPreviewCard extends StatelessWidget {
                 );
               },
               errorBuilder: (c, err, st) => Container(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(12),
                 child: const Text('Impossible de charger la carte'),

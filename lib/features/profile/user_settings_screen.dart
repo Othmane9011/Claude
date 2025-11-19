@@ -405,7 +405,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
                     ClipRect(
                       child: BackdropFilter(
                         filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(color: Colors.white.withOpacity(.18)),
+                        child: Container(color: Colors.white.withValues(alpha: 0.18)),
                       ),
                     ),
                     Align(
@@ -444,7 +444,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
                               Text(
                                 email,
                                 style: TextStyle(
-                                  color: Colors.black.withOpacity(.55),
+                                  color: Colors.black.withValues(alpha: 0.55),
                                 ),
                               ),
                           ],
@@ -559,7 +559,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
                           _lat != null && _lng != null
                               ? 'Zone: ${_lat!.toStringAsFixed(5)}, ${_lng!.toStringAsFixed(5)}'
                               : 'Zone: non définie',
-                          style: TextStyle(color: Colors.black.withOpacity(.7)),
+                          style: TextStyle(color: Colors.black.withValues(alpha: 0.7)),
                         ),
                       ),
                       FilledButton(
@@ -748,7 +748,7 @@ class _UserSettingsScreenState extends ConsumerState<UserSettingsScreen> {
                   if (_upcoming.isEmpty)
                     Text(
                       'Aucun rendez-vous à venir.',
-                      style: TextStyle(color: Colors.black.withOpacity(.7)),
+                      style: TextStyle(color: Colors.black.withValues(alpha: 0.7)),
                     )
                   else
                     ..._upcoming.map((m) => _BookingRow(m: m)),
@@ -840,7 +840,7 @@ class _LabeledField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(color: Colors.black.withOpacity(.6), fontSize: 12),
+          style: TextStyle(color: Colors.black.withValues(alpha: 0.6), fontSize: 12),
         ),
         const SizedBox(height: 6),
         TextField(
@@ -875,7 +875,7 @@ class _LabeledValue extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(color: Colors.black.withOpacity(.6), fontSize: 12),
+          style: TextStyle(color: Colors.black.withValues(alpha: 0.6), fontSize: 12),
         ),
         const SizedBox(height: 6),
         Container(
@@ -895,7 +895,7 @@ class _LabeledValue extends StatelessWidget {
             helper!,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.black.withOpacity(.55),
+              color: Colors.black.withValues(alpha: 0.55),
             ),
           ),
         ],
@@ -1004,7 +1004,7 @@ class _PetCard extends StatelessWidget {
                       ].join(' • '),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.black.withOpacity(.65)),
+                      style: TextStyle(color: Colors.black.withValues(alpha: 0.65)),
                     ),
                     const SizedBox(height: 8),
 

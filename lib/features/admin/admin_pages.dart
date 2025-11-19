@@ -245,9 +245,7 @@ Future<List<Map<String, dynamic>>> _load() async {
     offset: 0,
   );
   return rows.map<Map<String, dynamic>>((e) {
-    return (e is Map)
-        ? Map<String, dynamic>.from(e)
-        : <String, dynamic>{};
+    return Map<String, dynamic>.from(e as Map);
   }).toList();
 }
 
@@ -1101,9 +1099,7 @@ class _AdminProviderHistoryPageState
         .read(apiProvider)
         .adminHistoryMonthly(months: 12, providerId: widget.providerId);
     return list.map<Map<String, dynamic>>((raw) {
-      final m = (raw is Map)
-          ? Map<String, dynamic>.from(raw)
-          : <String, dynamic>{};
+      final m = Map<String, dynamic>.from(raw as Map);
       m['month'] = _canonYm((m['month'] ?? '').toString());
       return _normalizeMonthRow(m);
     }).toList();
@@ -1337,7 +1333,6 @@ class _AdminProviderHistoryPageState
                     final confirmed = _asInt(e['confirmed']);
                     final completed = _asInt(e['completed']);
                     final cancelled = _asInt(e['cancelled']);
-                    final dueDa = _asInt(e['dueDa']);
                     final collDa = _asInt(e['collectedDa']);
                     final netDa = _asInt(e['netDa']);
 

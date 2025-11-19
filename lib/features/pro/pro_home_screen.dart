@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:characters/characters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -105,7 +104,7 @@ final nextAppointmentProvider =
     final st = (m['status'] ?? '').toString();
     if (st != 'PENDING' && st != 'CONFIRMED') continue;
     if (t.isBefore(now)) continue;
-    if (nextDate == null || t.isBefore(nextDate!)) {
+    if (nextDate == null || t.isBefore(nextDate)) {
       nextDate = t;
       next = m;
     }
@@ -592,7 +591,7 @@ class _Header extends StatelessWidget {
               backgroundColor: Colors.white,
               child: Text(
                 doctorName.isNotEmpty
-                    ? doctorName.characters.first.toUpperCase()
+                    ? doctorName[0].toUpperCase()
                     : 'D',
                 style:
                     const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),

@@ -92,8 +92,7 @@ class _VetDetailsScreenState extends ConsumerState<VetDetailsScreen> {
   String? _selectedServiceId;
   String? _selectedSlotIso;
 
-  // Infos du service sélectionné (affichées dans l’UI)
-  String _selTitle = '';
+  // Infos du service sélectionné (affichées dans l'UI)
   String _selDesc  = '';
   int    _selDurationMin = 30;
   int?   _selPriceDa;
@@ -103,7 +102,6 @@ class _VetDetailsScreenState extends ConsumerState<VetDetailsScreen> {
   String _fmtDa(num v) => NumberFormat.decimalPattern('fr_FR').format(v);
 
   void _applySelectedService(Map<String, dynamic> svc) {
-    _selTitle = (svc['title'] ?? '').toString();
     _selDesc  = (svc['description'] ?? '').toString();
     _selDurationMin = int.tryParse('${svc['durationMin'] ?? ''}') ?? 30;
     final p = svc['price'];
@@ -148,12 +146,12 @@ class _VetDetailsScreenState extends ConsumerState<VetDetailsScreen> {
                 const Icon(Icons.star, size: 16, color: Colors.orange),
                 const SizedBox(width: 4),
                 Text(rating.toStringAsFixed(1)),
-                Text('  ($count avis)', style: TextStyle(color: Colors.black.withOpacity(.6))),
+                Text('  ($count avis)', style: TextStyle(color: Colors.black.withValues(alpha: 0.6))),
               ]),
               const SizedBox(height: 10),
               Text(
                 bio.isEmpty ? 'Pas de description.' : bio,
-                style: TextStyle(color: Colors.black.withOpacity(.75)),
+                style: TextStyle(color: Colors.black.withValues(alpha: 0.75)),
               ),
               const SizedBox(height: 18),
 
@@ -292,7 +290,6 @@ class _SlotsPickerNaive extends ConsumerStatefulWidget {
     required this.durationMin,
     required this.onSelect,
     this.selectedIso,
-    super.key,
   });
 
   @override

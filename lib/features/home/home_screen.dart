@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
 // 🗺️ preview map
@@ -138,19 +137,19 @@ final topVetsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
     status: 'approved',
   );
 
-  String _s(v) => v?.toString() ?? '';
-  double? _d(v) => v is num ? v.toDouble() : (v is String ? double.tryParse(v) : null);
+  String asStr(v) => v?.toString() ?? '';
+  double? asDbl(v) => v is num ? v.toDouble() : (v is String ? double.tryParse(v) : null);
 
   final out = <Map<String, dynamic>>[];
   for (final e in raw.whereType<Map>()) {
     final m = Map<String, dynamic>.from(e);
     out.add({
-      'id': _s(m['id']),
-      'displayName': _s(m['displayName'] ?? m['name'] ?? 'Vétérinaire'),
-      'address': _s(m['address']),
+      'id': asStr(m['id']),
+      'displayName': asStr(m['displayName'] ?? m['name'] ?? 'Vétérinaire'),
+      'address': asStr(m['address']),
       'distanceKm': null,
-      'lat': _d(m['lat']),
-      'lng': _d(m['lng']),
+      'lat': asDbl(m['lat']),
+      'lng': asDbl(m['lng']),
       'specialties': m['specialties'],
     });
   }
@@ -498,29 +497,6 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// -------------------- (optionnel) Barre de recherche --------------------
-class _SearchBar extends StatelessWidget {
-  const _SearchBar();
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: TextField(
-        readOnly: true,
-        decoration: InputDecoration(
-          hintText: 'Rechercher',
-          prefixIcon: const Icon(Icons.search),
-          filled: true,
-          fillColor: const Color(0xFFF6F6F6),
-          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-        ),
-        onTap: () {},
-      ),
-    );
-  }
-}
-
 /// -------------------- Catégories (oscillation) [désactivé] --------------------
 class _OscillatingCategories extends StatefulWidget {
   const _OscillatingCategories();
@@ -534,8 +510,8 @@ class _OscillatingCategoriesState extends State<_OscillatingCategories> {
   bool _paused = false;
   Timer? _resumeTimer;
   int _dir = 1;
-  static const _STEP = 1.0;
-  static const _PERIOD = Duration(milliseconds: 20);
+  static const _step = 1.0;
+  static const _period = Duration(milliseconds: 20);
 
   final _cats = const [
     ('Vet', Icons.pets, '/explore/vets'),
@@ -563,11 +539,11 @@ class _OscillatingCategoriesState extends State<_OscillatingCategories> {
 
   void _start() {
     _tick?.cancel();
-    _tick = Timer.periodic(_PERIOD, (_) {
+    _tick = Timer.periodic(_period, (_) {
       if (!mounted || _paused || !_ctl.hasClients) return;
       final max = _ctl.position.maxScrollExtent;
       if (max <= 0) return;
-      var next = _ctl.offset + (_dir * _STEP);
+      var next = _ctl.offset + (_dir * _step);
       if (next <= 0) {
         next = 0;
         _dir = 1;
@@ -632,7 +608,7 @@ class _OscillatingCategoriesState extends State<_OscillatingCategories> {
 
 /// -------------------- Bandeau RDV confirmé (tap => page détails) --------------------
 class _NextConfirmedBanner extends ConsumerStatefulWidget {
-  const _NextConfirmedBanner({super.key});
+  const _NextConfirmedBanner();
   @override
   ConsumerState<_NextConfirmedBanner> createState() => _NextConfirmedBannerState();
 }
@@ -719,9 +695,9 @@ class _NextConfirmedBannerState extends ConsumerState<_NextConfirmedBanner> {
   }
 }
 
-/// -------------------- Bandeau RDV pending (actions Annuler/Modifier, pas d’itinéraire) --------------------
+/// -------------------- Bandeau RDV pending (actions Annuler/Modifier, pas d'itinéraire) --------------------
 class _NextPendingBanner extends ConsumerStatefulWidget {
-  const _NextPendingBanner({super.key});
+  const _NextPendingBanner();
   @override
   ConsumerState<_NextPendingBanner> createState() => _NextPendingBannerState();
 }
@@ -929,7 +905,7 @@ class _NextPendingBannerState extends ConsumerState<_NextPendingBanner> {
 }
 
 class _ExploreGrid extends StatelessWidget {
-  const _ExploreGrid({super.key});
+  const _ExploreGrid();
 
   @override
   Widget build(BuildContext context) {
@@ -984,15 +960,12 @@ class _ExploreCard extends StatelessWidget {
     required this.onTap,
     this.big = false,
     this.bgAsset, // image de fond (plein cadre)
-    this.icon,    // fallback si pas d'image
-    super.key,
   });
 
   final String title;
   final VoidCallback onTap;
   final bool big;
   final String? bgAsset;
-  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -1056,11 +1029,6 @@ class _ExploreCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (!hasBg && icon != null)
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Icon(icon, size: big ? 36 : 28, color: rose),
-                        ),
                     ],
                   ),
                 ),
@@ -1075,7 +1043,7 @@ class _ExploreCard extends StatelessWidget {
 
 /// -------------------- Preview Map (Home) --------------------
 class _MapPreview extends ConsumerWidget {
-  const _MapPreview({super.key});
+  const _MapPreview();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1237,31 +1205,10 @@ class _MapPlaceholder extends StatelessWidget {
   }
 }
 
-class _GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = const Color(0x11F36C6C)
-      ..strokeWidth = 1;
-
-    const step = 18.0;
-    for (double x = 0; x < size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), p);
-    }
-    for (double y = 0; y < size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), p);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
 /// -------------------- Vethub --------------------
 class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.text, {this.trailing});
+  const _SectionTitle(this.text);
   final String text;
-  final Widget? trailing;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -1269,7 +1216,6 @@ class _SectionTitle extends StatelessWidget {
       child: Row(children: [
         Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
         const Spacer(),
-        if (trailing != null) trailing!,
       ]),
     );
   }
@@ -1322,7 +1268,7 @@ class _VethubRow extends StatelessWidget {
 
 /// -------------------- Top spécialistes --------------------
 class _TopSpecialistsList extends ConsumerWidget {
-  const _TopSpecialistsList({super.key});
+  const _TopSpecialistsList();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(topVetsProvider);
