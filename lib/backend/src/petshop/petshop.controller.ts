@@ -178,6 +178,14 @@ export class CustomerOrderController {
   ) {
     return this.petshop.createOrder(user.id, dto.providerId, dto.items);
   }
+
+  @Get('me')
+  async myOrders(
+    @ReqUser() user: { id: string },
+    @Query('status') status?: string,
+  ) {
+    return this.petshop.listClientOrders(user.id, status);
+  }
 }
 
 // Alternative route for petshop/orders

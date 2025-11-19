@@ -312,6 +312,43 @@ export class PetshopService {
     return order;
   }
 
+  // ========= Client Orders =========
+
+  async listClientOrders(userId: string, status?: string) {
+    const where: any = {
+      userId,
+      ...(status && status !== 'ALL' ? { status: status as any } : {}),
+    };
+
+    const orders = await this.prisma.order.findMany({
+      where,
+      include: {
+        provider: {
+          select: {
+            id: true,
+            displayName: true,
+            address: true,
+          },
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                title: true,
+                imageUrls: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+
+    return orders;
+  }
+
   // ========= Public endpoints =========
 
   async listPublicProducts(providerId: string) {
