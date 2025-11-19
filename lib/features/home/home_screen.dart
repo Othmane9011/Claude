@@ -76,7 +76,7 @@ void _showNotifDialog(BuildContext context) {
             ),
             child: ValueListenableBuilder<List<_Notif>>(
               valueListenable: NotificationsStore.instance,
-              builder: (_, items, __) {
+              builder: (_, items, _) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -93,7 +93,7 @@ void _showNotifDialog(BuildContext context) {
                       Expanded(
                         child: ListView.separated(
                           itemCount: items.length,
-                          separatorBuilder: (_, __) => const Divider(height: 1),
+                          separatorBuilder: (_, _) => const Divider(height: 1),
                           itemBuilder: (_, i) {
                             final n = items[i];
                             return ListTile(
@@ -102,7 +102,7 @@ void _showNotifDialog(BuildContext context) {
                               subtitle: Text(n.body),
                               trailing: Text(
                                 TimeOfDay.fromDateTime(n.at).format(context),
-                                style: TextStyle(color: Colors.black.withOpacity(.5), fontSize: 12),
+                                style: TextStyle(color: Colors.black.withValues(alpha:.5), fontSize: 12),
                               ),
                             );
                           },
@@ -179,7 +179,7 @@ final homeUserPositionStreamProvider = StreamProvider<Position?>((ref) async* {
 
     // valeur initiale rapide si dispo
     try {
-      final first = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      final first = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium));
       yield first;
     } catch (_) {}
 
@@ -468,7 +468,7 @@ class _Header extends StatelessWidget {
                 if (subtitle != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 2),
-                    child: Text(subtitle, style: TextStyle(fontSize: 12.5, color: Colors.black.withOpacity(.55))),
+                    child: Text(subtitle, style: TextStyle(fontSize: 12.5, color: Colors.black.withValues(alpha:.55))),
                   ),
               ],
             ),
@@ -1021,7 +1021,7 @@ class _ExploreCard extends StatelessWidget {
                 : LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: big ? [rose.withOpacity(.18), roseLight] : [roseLight, Colors.white],
+                    colors: big ? [rose.withValues(alpha:.18), roseLight] : [roseLight, Colors.white],
                   ),
             boxShadow: const [BoxShadow(color: Color(0x11000000), blurRadius: 10, offset: Offset(0, 6))],
             border: Border.all(color: const Color(0xFFFFD6DA)),
@@ -1032,7 +1032,7 @@ class _ExploreCard extends StatelessWidget {
               children: [
                 if (hasBg)
                   Positioned.fill(
-                    child: Container(color: rose.withOpacity(0.18)), // voile pour lisibilité
+                    child: Container(color: rose.withValues(alpha:0.18)), // voile pour lisibilité
                   ),
                 Padding(
                   padding: const EdgeInsets.all(14),
@@ -1289,7 +1289,7 @@ class _VethubRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
         itemCount: cards.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 14),
+        separatorBuilder: (_, _) => const SizedBox(width: 14),
         itemBuilder: (_, i) {
           final (img, title, route) = cards[i];
           return InkWell(
@@ -1308,7 +1308,7 @@ class _VethubRow extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.all(12),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(.9), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha:.9), borderRadius: BorderRadius.circular(10)),
                   child: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
                 ),
               ),
@@ -1337,7 +1337,7 @@ class _TopSpecialistsList extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
             itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemBuilder: (_, i) {
               final m = items[i];
               final id = (m['id'] ?? '').toString();
@@ -1390,7 +1390,7 @@ class _DoctorCard extends StatelessWidget {
           Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
           const SizedBox(height: 2),
           Text(address.isEmpty ? '—' : address,
-              style: TextStyle(color: Colors.black.withOpacity(.55), fontSize: 12),
+              style: TextStyle(color: Colors.black.withValues(alpha:.55), fontSize: 12),
               maxLines: 1, overflow: TextOverflow.ellipsis),
           const Spacer(),
           if (dist is num)
@@ -1399,7 +1399,7 @@ class _DoctorCard extends StatelessWidget {
               children: [
                 const Icon(Icons.place, size: 14, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text('${(dist as num).toStringAsFixed(1)} km', style: TextStyle(color: Colors.black.withOpacity(.7))),
+                Text('${(dist as num).toStringAsFixed(1)} km', style: TextStyle(color: Colors.black.withValues(alpha:.7))),
               ],
             ),
         ],

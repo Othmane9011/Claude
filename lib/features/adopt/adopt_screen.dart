@@ -4,15 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/api.dart';
 
-const _kInk = Color(0xFF1F2328);
-const _kCoral = Color(0xFFF36C6C);
-
 final _requestsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
   // TODO backend: endpoint "likes reçus" pour vos annonces.
-  // Fallback: montre vos "likes" en supposant mutual=false (demo).
-  final api = ref.read(apiProvider);
-  final mine = await api.myAdoptPosts(); // vos annonces
-  final likes = await api.adoptMyLikes(); // vos likes (pas idéal pour requests)
   // Sans endpoint inbound, on affiche liste vide pour "Demandes".
   // Laisse la structure en place pour brancher plus tard.
   return <Map<String, dynamic>>[];
@@ -77,7 +70,7 @@ class _RequestsTab extends ConsumerWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(12),
           itemCount: list.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          separatorBuilder: (_, _) => const SizedBox(height: 8),
           itemBuilder: (_, i) => _RequestTile(item: list[i]),
         );
       },
@@ -141,7 +134,7 @@ class _ChatsTab extends ConsumerWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(12),
           itemCount: list.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          separatorBuilder: (_, _) => const SizedBox(height: 8),
           itemBuilder: (_, i) {
             final m = list[i];
             final petName = (m['petName'] ?? m['title'] ?? 'Animal').toString();

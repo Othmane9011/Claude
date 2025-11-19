@@ -35,36 +35,36 @@ ThemeData _proTheme(BuildContext context) {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: ButtonStyle(
-        backgroundColor: const MaterialStatePropertyAll(_ProColors.salmon),
-        foregroundColor: const MaterialStatePropertyAll(Colors.white),
+        backgroundColor: const WidgetStatePropertyAll(_ProColors.salmon),
+        foregroundColor: const WidgetStatePropertyAll(Colors.white),
         overlayColor:
-            MaterialStatePropertyAll(_ProColors.salmon.withOpacity(.12)),
-        shape: MaterialStatePropertyAll(
+            WidgetStatePropertyAll(_ProColors.salmon.withValues(alpha:.12)),
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        padding: const MaterialStatePropertyAll(
+        padding: const WidgetStatePropertyAll(
           EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),
-        textStyle: const MaterialStatePropertyAll(
+        textStyle: const WidgetStatePropertyAll(
           TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
-        foregroundColor: const MaterialStatePropertyAll(_ProColors.salmon),
-        side: const MaterialStatePropertyAll(
+        foregroundColor: const WidgetStatePropertyAll(_ProColors.salmon),
+        side: const WidgetStatePropertyAll(
           BorderSide(color: _ProColors.salmon, width: 1.2),
         ),
         overlayColor:
-            MaterialStatePropertyAll(_ProColors.salmon.withOpacity(.08)),
-        shape: MaterialStatePropertyAll(
+            WidgetStatePropertyAll(_ProColors.salmon.withValues(alpha:.08)),
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        padding: const MaterialStatePropertyAll(
+        padding: const WidgetStatePropertyAll(
           EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),
-        textStyle: const MaterialStatePropertyAll(
+        textStyle: const WidgetStatePropertyAll(
           TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
@@ -844,9 +844,9 @@ class _ActionCardState extends State<_ActionCard>
         borderRadius: BorderRadius.circular(18),
         child: Ink(
           decoration: BoxDecoration(
-            color: it.color.withOpacity(.08),
+            color: it.color.withValues(alpha:.08),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: it.color.withOpacity(.16)),
+            border: Border.all(color: it.color.withValues(alpha:.16)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(14),
@@ -854,7 +854,7 @@ class _ActionCardState extends State<_ActionCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
-                  backgroundColor: it.color.withOpacity(.15),
+                  backgroundColor: it.color.withValues(alpha:.15),
                   child: Icon(it.icon, color: it.color),
                 ),
                 const Spacer(),
@@ -945,7 +945,7 @@ class _CommissionDueCard extends StatelessWidget {
                       monthLabel,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.black.withOpacity(.65)),
+                      style: TextStyle(color: Colors.black.withValues(alpha:.65)),
                     ),
                   ],
                 ),
@@ -986,7 +986,7 @@ class _CommissionDueCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: _ProColors.salmonSoft,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: _ProColors.salmon.withOpacity(.35)),
+                border: Border.all(color: _ProColors.salmon.withValues(alpha:.35)),
               ),
               child: Row(
                 children: [
@@ -1028,7 +1028,7 @@ class _CommissionDueCard extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.black.withOpacity(.70)),
+                style: TextStyle(color: Colors.black.withValues(alpha:.70)),
               ),
             ),
             const SizedBox(width: 8),
@@ -1110,7 +1110,7 @@ class _GeneratedWithBookings extends StatelessWidget {
               if (rows.length > 20)
                 Text(
                   '+${rows.length - 20} autres…',
-                  style: TextStyle(color: Colors.black.withOpacity(.6)),
+                  style: TextStyle(color: Colors.black.withValues(alpha:.6)),
                 ),
               if (showTotals) ...[
                 const SizedBox(height: 10),
@@ -1162,7 +1162,7 @@ class _GeneratedWithBookings extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.black.withOpacity(.70)),
+              style: TextStyle(color: Colors.black.withValues(alpha:.70)),
             ),
           ),
           const SizedBox(width: 8),

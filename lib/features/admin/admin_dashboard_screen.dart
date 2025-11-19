@@ -474,7 +474,7 @@ Future<void> _openProviderSheet(Map<String, dynamic> p) async {
                 decoration: BoxDecoration(
                   color: _salmonSoft,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _salmon.withOpacity(0.35)),
+                  border: Border.all(color: _salmon.withValues(alpha: 0.35)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
@@ -521,7 +521,7 @@ Future<void> _openProviderSheet(Map<String, dynamic> p) async {
                     onRefresh: () async => setState(() {}),
                     child: ListView.separated(
                       itemCount: items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      separatorBuilder: (_, _) => const Divider(height: 1),
                       itemBuilder: (_, i) {
                         final p = items[i] as Map<String, dynamic>;
                         final id = (p['id'] ?? '') as String;
@@ -532,8 +532,6 @@ Future<void> _openProviderSheet(Map<String, dynamic> p) async {
                         final u = (p['user'] as Map?) ?? const {};
                         final email = (u['email'] ?? '') as String;
                         final phone = (u['phone'] ?? '') as String?;
-                        final lat = (p['lat'] as num?)?.toDouble();
-                        final lng = (p['lng'] as num?)?.toDouble();
 
                         return ListTile(
                           onTap: () => _openProviderSheet(p),
@@ -553,7 +551,6 @@ Future<void> _openProviderSheet(Map<String, dynamic> p) async {
                             [
                               if (email.isNotEmpty) email,
                               if (addr.isNotEmpty) addr,
-                              if (lat != null && lng != null) 'lat=${lat.toStringAsFixed(4)} lng=${lng.toStringAsFixed(4)}',
                             ].join(' • '),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -601,18 +598,6 @@ Future<void> _openProviderSheet(Map<String, dynamic> p) async {
 
   // ===== Helpers communs =====
 
-  static String _formatDate(String iso) {
-    if (iso.isEmpty) return '—';
-    try {
-      final d = DateTime.tryParse(iso);
-      if (d == null) return iso;
-      String two(int n) => n.toString().padLeft(2, '0');
-      return '${two(d.day)}/${two(d.month)}/${d.year} ${two(d.hour)}:${two(d.minute)}';
-    } catch (_) {
-      return iso;
-    }
-  }
-
   Future<void> _showCallSheet(String? phone, {String? name}) async {
     final p = (phone ?? '').trim();
     await showModalBottomSheet<void>(
@@ -631,7 +616,7 @@ Future<void> _openProviderSheet(Map<String, dynamic> p) async {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -679,7 +664,7 @@ Future<void> _openProviderSheet(Map<String, dynamic> p) async {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 130, child: Text(k, style: TextStyle(color: Colors.black.withOpacity(0.6)))),
+          SizedBox(width: 130, child: Text(k, style: TextStyle(color: Colors.black.withValues(alpha: 0.6)))),
           const SizedBox(width: 8),
           Expanded(child: Text(v)),
         ],
@@ -688,7 +673,7 @@ Future<void> _openProviderSheet(Map<String, dynamic> p) async {
   }
 
   Widget _label(String s) =>
-      Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(s, style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 13)));
+      Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(s, style: TextStyle(color: Colors.black.withValues(alpha: 0.6), fontSize: 13)));
 }
 
 class _MapPreviewCard extends StatelessWidget {
@@ -722,7 +707,7 @@ class _MapPreviewCard extends StatelessWidget {
               loadingBuilder: (c, child, prog) {
                 if (prog == null) return child;
                 return Container(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   alignment: Alignment.center,
                   child: const CircularProgressIndicator(strokeWidth: 2),
                 );

@@ -26,7 +26,7 @@ final _userCenterProvider = FutureProvider<LatLng>((ref) async {
             .timeout(const Duration(milliseconds: 300), onTimeout: () => null);
         if (last != null) return LatLng(last.latitude, last.longitude);
         final cur = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.medium,
+          locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
         ).timeout(const Duration(seconds: 2));
         return LatLng(cur.latitude, cur.longitude);
       }
@@ -422,7 +422,7 @@ class _FilterPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = selected ? _coral : Colors.white;
     final fg = selected ? Colors.white : _coral;
-    final br = selected ? _coral : _coral.withOpacity(.35);
+    final br = selected ? _coral : _coral.withValues(alpha: 0.35);
 
     return Material(
       color: bg,

@@ -163,12 +163,12 @@ class _BookingFlowScreenState extends ConsumerState<BookingFlowScreen> {
                 const Icon(Icons.star, size: 16, color: Colors.orange),
                 const SizedBox(width: 4),
                 Text(rating.toStringAsFixed(1)),
-                Text('  ($count avis)', style: TextStyle(color: Colors.black.withOpacity(.6))),
+                Text('  ($count avis)', style: TextStyle(color: Colors.black.withValues(alpha:.6))),
               ]),
               const SizedBox(height: 10),
               Text(
                 bio.isEmpty ? 'Pas de description.' : bio,
-                style: TextStyle(color: Colors.black.withOpacity(.75)),
+                style: TextStyle(color: Colors.black.withValues(alpha:.75)),
               ),
               const SizedBox(height: 18),
 

@@ -24,9 +24,6 @@ import '../features/bookings/booking_details_screen.dart';
 import '../features/bookings/my_bookings_screen.dart';
 
 // Adopt
-
-import '../features/adopt/adopt_screen.dart';
-import '../features/adopt/adopt_chats_screen.dart';
 import '../features/adopt/adopt_create_screen.dart';
 
 
@@ -73,19 +70,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/gate',
     routes: <RouteBase>[
       // -------- Gate / Start --------
-      GoRoute(path: '/gate', builder: (_, __) => const RoleGateScreen()),
+      GoRoute(path: '/gate', builder: (_, _) => const RoleGateScreen()),
       GoRoute(
         path: '/start/user',
-        builder: (_, __) => const StartScreen(variant: StartVariant.user),
+        builder: (_, _) => const StartScreen(variant: StartVariant.user),
       ),
       GoRoute(
         path: '/start/pro',
-        builder: (_, __) => const StartScreen(variant: StartVariant.pro),
+        builder: (_, _) => const StartScreen(variant: StartVariant.pro),
       ),
 
       // -------- Aliases & redirects utiles --------
       // ancien liens "vets" -> nouvelle route "explore/vets"
-      GoRoute(path: '/vets', redirect: (_, __) => '/explore/vets'),
+      GoRoute(path: '/vets', redirect: (_, _) => '/explore/vets'),
       GoRoute(
         path: '/vets/:id',
         redirect: (ctx, st) => '/explore/vets/${st.pathParameters['id']}',
@@ -93,10 +90,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // ancien "/pro/pending" -> canonical
       GoRoute(
         path: '/pro/pending',
-        redirect: (_, __) => '/pro/application/submitted',
+        redirect: (_, _) => '/pro/application/submitted',
       ),
       // racine pro -> home
-      GoRoute(path: '/pro', redirect: (_, __) => '/pro/home'),
+      GoRoute(path: '/pro', redirect: (_, _) => '/pro/home'),
 
  GoRoute(
   path: '/booking-details',
@@ -107,12 +104,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
 
       // -------- Admin --------
-GoRoute(path: '/admin/hub', builder: (_, __) => const AdminHubScreen()),
-GoRoute(path: '/admin/dashboard', redirect: (_, __) => '/admin/hub'),
-GoRoute(path: '/admin/users', builder: (_, __) => const AdminUsersPage()),
-GoRoute(path: '/admin/pros', builder:  (_, __) => const AdminProsApprovedPage()),
-GoRoute(path: '/admin/applications', builder: (_, __) => const AdminApplicationsPage()),
-GoRoute(path: '/admin/commissions', builder: (_, __) => const AdminCommissionsPage()),
+GoRoute(path: '/admin/hub', builder: (_, _) => const AdminHubScreen()),
+GoRoute(path: '/admin/dashboard', redirect: (_, _) => '/admin/hub'),
+GoRoute(path: '/admin/users', builder: (_, _) => const AdminUsersPage()),
+GoRoute(path: '/admin/pros', builder:  (_, _) => const AdminProsApprovedPage()),
+GoRoute(path: '/admin/applications', builder: (_, _) => const AdminApplicationsPage()),
+GoRoute(path: '/admin/commissions', builder: (_, _) => const AdminCommissionsPage()),
 
       // -------- Auth --------
       GoRoute(
@@ -145,33 +142,33 @@ GoRoute(path: '/admin/commissions', builder: (_, __) => const AdminCommissionsPa
       // -------- States d’application PRO --------
       GoRoute(
         path: '/pro/application/submitted',
-        builder: (_, __) => const ProApplicationSubmittedScreen(),
+        builder: (_, _) => const ProApplicationSubmittedScreen(),
       ),
       GoRoute(
         path: '/pro/application/rejected',
-        builder: (_, __) => const ProApplicationRejectedScreen(),
+        builder: (_, _) => const ProApplicationRejectedScreen(),
       ),
 
       // -------- Onboarding pet --------
       GoRoute(
         path: '/onboard/pet',
-        builder: (_, __) => const _Placeholder(title: 'Onboarding Pet'),
+        builder: (_, _) => const _Placeholder(title: 'Onboarding Pet'),
       ),
 
 
 
 
       // -------- Home (client) --------
-      GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
+      GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
       GoRoute(
         path: '/me/bookings',
-        builder: (_, __) => const MyBookingsScreen(),
+        builder: (_, _) => const MyBookingsScreen(),
       ),
 
       // -------- Profil / Settings (user) --------
       GoRoute(
         path: '/settings',
-        builder: (_, __) => const UserSettingsScreen(),
+        builder: (_, _) => const UserSettingsScreen(),
       ),
 
       // -------- Hérités (provider & booking) --------
@@ -206,7 +203,7 @@ GoRoute(path: '/admin/commissions', builder: (_, __) => const AdminCommissionsPa
       ),
 
       // -------- Nouveau flow Vet (liste → détail) --------
-      GoRoute(path: '/explore/vets', builder: (_, __) => const VetListScreen()),
+      GoRoute(path: '/explore/vets', builder: (_, _) => const VetListScreen()),
       GoRoute(
         path: '/explore/vets/:id',
         builder: (ctx, st) =>
@@ -216,7 +213,7 @@ GoRoute(path: '/admin/commissions', builder: (_, __) => const AdminCommissionsPa
       // -------- Flow Petshop (liste → produits) --------
       GoRoute(
         path: '/explore/petshop',
-        builder: (_, __) => const PetshopListScreen(),
+        builder: (_, _) => const PetshopListScreen(),
       ),
       GoRoute(
         path: '/explore/petshop/:id',
@@ -271,26 +268,26 @@ GoRoute(path: '/admin/commissions', builder: (_, __) => const AdminCommissionsPa
           child: ProShell(child: child),
         ),
         routes: [
-          GoRoute(path: '/pro/home', builder: (_, __) => const ProHomeScreen()),
+          GoRoute(path: '/pro/home', builder: (_, _) => const ProHomeScreen()),
           GoRoute(
             path: '/pro/agenda',
-            builder: (_, __) => const ProviderAgendaScreen(),
+            builder: (_, _) => const ProviderAgendaScreen(),
           ),
           GoRoute(
             path: '/pro/services',
-            builder: (_, __) => const ProServicesScreen(),
+            builder: (_, _) => const ProServicesScreen(),
           ),
           GoRoute(
             path: '/pro/availability',
-            builder: (_, __) => const ProAvailabilityScreen(),
+            builder: (_, _) => const ProAvailabilityScreen(),
           ),
           GoRoute(
             path: '/pro/appointments',
-            builder: (_, __) => const ProAppointmentsScreen(),
+            builder: (_, _) => const ProAppointmentsScreen(),
           ),
           GoRoute(
             path: '/pro/patients',
-            builder: (_, __) => const ProPatientsScreen(),
+            builder: (_, _) => const ProPatientsScreen(),
           ),
           // ✅ Settings passe sous le shell (protégé, back stack propre)
           GoRoute(

@@ -29,34 +29,34 @@ ThemeData _adminTheme(BuildContext context) {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: ButtonStyle(
-        backgroundColor: const MaterialStatePropertyAll(salmon),
-        foregroundColor: const MaterialStatePropertyAll(Colors.white),
-        overlayColor: MaterialStatePropertyAll(salmon.withOpacity(.12)),
-        shape: MaterialStatePropertyAll(
+        backgroundColor: const WidgetStatePropertyAll(salmon),
+        foregroundColor: const WidgetStatePropertyAll(Colors.white),
+        overlayColor: WidgetStatePropertyAll(salmon.withValues(alpha:.12)),
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        padding: const MaterialStatePropertyAll(
+        padding: const WidgetStatePropertyAll(
           EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),
-        textStyle: const MaterialStatePropertyAll(
+        textStyle: const WidgetStatePropertyAll(
           TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
-        foregroundColor: const MaterialStatePropertyAll(salmon),
-        side: const MaterialStatePropertyAll(
+        foregroundColor: const WidgetStatePropertyAll(salmon),
+        side: const WidgetStatePropertyAll(
           BorderSide(color: salmon, width: 1.2),
         ),
-        overlayColor: MaterialStatePropertyAll(salmon.withOpacity(.08)),
-        shape: MaterialStatePropertyAll(
+        overlayColor: WidgetStatePropertyAll(salmon.withValues(alpha:.08)),
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        padding: const MaterialStatePropertyAll(
+        padding: const WidgetStatePropertyAll(
           EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),
-        textStyle: const MaterialStatePropertyAll(
+        textStyle: const WidgetStatePropertyAll(
           TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
@@ -118,7 +118,7 @@ class _StatusEmojiBar extends StatelessWidget {
           color: _soft,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: AdminColors.salmon.withOpacity(.55),
+            color: AdminColors.salmon.withValues(alpha:.55),
             width: 1,
           ),
         ),
@@ -185,7 +185,7 @@ Widget _pillMini(String emoji, int n) {
         color: soft,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AdminColors.salmon.withOpacity(.55),
+          color: AdminColors.salmon.withValues(alpha:.55),
           width: 1,
         ),
       ),
@@ -246,7 +246,7 @@ Future<List<Map<String, dynamic>>> _load() async {
   );
   return rows.map<Map<String, dynamic>>((e) {
     return (e is Map)
-        ? Map<String, dynamic>.from(e as Map)
+        ? Map<String, dynamic>.from(e)
         : <String, dynamic>{};
   }).toList();
 }
@@ -294,7 +294,7 @@ Future<List<Map<String, dynamic>>> _load() async {
                     onRefresh: () async => setState(() {}),
                     child: ListView.separated(
                       itemCount: items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      separatorBuilder: (_, _) => const Divider(height: 1),
                       itemBuilder: (_, i) {
                         final m = items[i];
                         final email = (m['email'] ?? '').toString();
@@ -418,7 +418,7 @@ class _AdminProsApprovedPageState extends ConsumerState<AdminProsApprovedPage> {
                     onRefresh: () async => setState(() {}),
                     child: ListView.separated(
                       itemCount: items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      separatorBuilder: (_, _) => const Divider(height: 1),
                       itemBuilder: (_, i) {
                         final p = Map<String, dynamic>.from(items[i] as Map);
                         final name = (p['displayName'] ?? '').toString();
@@ -510,7 +510,7 @@ class _AdminApplicationsPageState extends ConsumerState<AdminApplicationsPage> {
                   color: const Color(0xFFFFE7E7),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AdminColors.salmon.withOpacity(0.35),
+                    color: AdminColors.salmon.withValues(alpha:0.35),
                   ),
                 ),
                 child: Padding(
@@ -565,7 +565,7 @@ class _AdminApplicationsPageState extends ConsumerState<AdminApplicationsPage> {
                     onRefresh: () async => setState(() {}),
                     child: ListView.separated(
                       itemCount: items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      separatorBuilder: (_, _) => const Divider(height: 1),
                       itemBuilder: (_, i) {
                         final p = Map<String, dynamic>.from(items[i] as Map);
                         final id = (p['id'] ?? '').toString();
@@ -707,7 +707,7 @@ class _AdminCommissionsPageState extends ConsumerState<AdminCommissionsPage> {
   Widget _metric(String label, int amount) {
     return Text(
       '$label: ${formatDa(amount)}',
-      style: TextStyle(fontSize: 12, color: Colors.black.withOpacity(.65)),
+      style: TextStyle(fontSize: 12, color: Colors.black.withValues(alpha:.65)),
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -981,7 +981,7 @@ class _AdminCommissionsPageState extends ConsumerState<AdminCommissionsPage> {
                                               Text(email, overflow: TextOverflow.ellipsis),
                                               Text(
                                                 '$completed RDV complétés',
-                                                style: TextStyle(color: Colors.black.withOpacity(.65)),
+                                                style: TextStyle(color: Colors.black.withValues(alpha:.65)),
                                               ),
                                             ],
                                           ),
@@ -1201,7 +1201,7 @@ class _AdminProviderHistoryPageState
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFFFFE7E7).withOpacity(.7),
+                  color: const Color(0xFFFFE7E7).withValues(alpha:.7),
                 ),
               ),
               child: Row(
@@ -1376,7 +1376,7 @@ class _AdminProviderHistoryPageState
                             Text(
                               'collectés: ${formatDa(collDa)}',
                               style: TextStyle(
-                                color: Colors.black.withOpacity(.6),
+                                color: Colors.black.withValues(alpha:.6),
                                 fontSize: 12,
                               ),
                             ),

@@ -7,7 +7,7 @@ class ProApplicationRejectedScreen extends ConsumerWidget {
   const ProApplicationRejectedScreen({super.key});
 
   Map<String, dynamic>? _asMap(dynamic v) {
-    if (v is Map) return Map<String, dynamic>.from(v as Map);
+    if (v is Map) return Map<String, dynamic>.from(v);
     return null;
   }
 
