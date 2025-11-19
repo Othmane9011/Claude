@@ -1,11 +1,15 @@
 // src/pets/pets.service.ts
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { S3Service } from '../uploads/s3.service';
 import { randomBytes } from 'crypto';
 
 @Injectable()
 export class PetsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private s3: S3Service,
+  ) {}
 
   listMine(ownerId: string) {
     return this.prisma.pet.findMany({
@@ -50,6 +54,11 @@ export class PetsService {
     if (!pet) throw new NotFoundException('Pet not found');
     if (pet.ownerId !== ownerId) throw new ForbiddenException();
 
+    // Supprime l'ancienne photo si une nouvelle est uploadée
+    if (dto.photoUrl && dto.photoUrl !== pet.photoUrl && pet.photoUrl) {
+      this.s3.deleteByUrl(pet.photoUrl).catch(() => {});
+    }
+
     const data: any = {
       name: dto.name ?? pet.name,
       species: dto.species ?? pet.species,
@@ -92,6 +101,12 @@ export class PetsService {
     const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
     if (!pet) throw new NotFoundException('Pet not found');
     if (pet.ownerId !== ownerId) throw new ForbiddenException();
+
+    // Supprime la photo du pet si elle existe
+    if (pet.photoUrl) {
+      this.s3.deleteByUrl(pet.photoUrl).catch(() => {});
+    }
+
     return this.prisma.pet.delete({ where: { id: petId } });
   }
 
