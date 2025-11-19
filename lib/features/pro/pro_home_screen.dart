@@ -780,7 +780,7 @@ class _ActionGrid extends StatelessWidget {
           const Color(0xFF7B2CBF)),
       _Action('Services & Tarifs', Icons.medical_services, '/pro/services',
           const Color(0xFF3A86FF)),
-      _Action('Patients', Icons.pets, '/pro/patients',
+      _Action('Scanner patient', Icons.qr_code_scanner, '/vet/scan',
           const Color(0xFFFF6D00)),
     ];
 
