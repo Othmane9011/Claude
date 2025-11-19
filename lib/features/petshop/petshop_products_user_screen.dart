@@ -321,7 +321,7 @@ class _PetshopProductsUserScreenState extends ConsumerState<PetshopProductsUserS
                           sliver: SliverGrid(
                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              childAspectRatio: 0.68,
+                              childAspectRatio: 0.58,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,
                             ),
@@ -370,14 +370,14 @@ class _PetshopProductsUserScreenState extends ConsumerState<PetshopProductsUserS
   }
 }
 
-class _CartSummaryBar extends StatelessWidget {
+class _CartSummaryBar extends ConsumerWidget {
   final CartState cart;
   const _CartSummaryBar({required this.cart});
 
   String _da(int v) => '${NumberFormat.decimalPattern("fr_FR").format(v)} DA';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       decoration: BoxDecoration(
@@ -431,11 +431,27 @@ class _CartSummaryBar extends StatelessWidget {
                           fontSize: 13,
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      // Button to view/edit cart
+                      InkWell(
+                        onTap: () => _showCartModal(context, ref),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'Modifier',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _da(cart.totalDa),
+                    _da(cart.subtotalDa),
                     style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 20,
@@ -465,6 +481,184 @@ class _CartSummaryBar extends StatelessWidget {
       ),
     );
   }
+
+  void _showCartModal(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Text(
+                    'Mon panier',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      ref.read(cartProvider.notifier).clear();
+                      Navigator.pop(ctx);
+                    },
+                    child: const Text('Vider', style: TextStyle(color: Colors.red)),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(16),
+                itemCount: cart.items.length,
+                itemBuilder: (_, i) {
+                  final item = cart.items[i];
+                  return _CartItemTile(item: item);
+                },
+              ),
+            ),
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total', style: TextStyle(fontWeight: FontWeight.w700)),
+                  Text(_da(cart.subtotalDa),
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CartItemTile extends ConsumerWidget {
+  final CartItem item;
+  const _CartItemTile({required this.item});
+
+  String _da(int v) => '${NumberFormat.decimalPattern("fr_FR").format(v)} DA';
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          // Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: item.imageUrl != null && item.imageUrl!.startsWith('http')
+                ? Image.network(
+                    item.imageUrl!,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _placeholder(),
+                  )
+                : _placeholder(),
+          ),
+          const SizedBox(width: 12),
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _da(item.priceDa),
+                  style: const TextStyle(color: _coral, fontWeight: FontWeight.w700, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          // Quantity controls
+          Row(
+            children: [
+              InkWell(
+                onTap: () => ref.read(cartProvider.notifier).decrementQuantity(item.productId),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Icon(
+                    item.quantity == 1 ? Icons.delete_outline : Icons.remove,
+                    size: 16,
+                    color: item.quantity == 1 ? Colors.red : _ink,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  '${item.quantity}',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+              InkWell(
+                onTap: () => ref.read(cartProvider.notifier).incrementQuantity(item.productId),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: _coral,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(Icons.add, size: 16, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      width: 50,
+      height: 50,
+      color: _coralSoft,
+      child: const Icon(Icons.inventory_2, size: 24, color: _coral),
+    );
+  }
 }
 
 class _ProductCard extends ConsumerWidget {
@@ -477,8 +671,10 @@ class _ProductCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final title = (product['title'] ?? '').toString();
+    final description = (product['description'] ?? '').toString();
     final productId = (product['id'] ?? '').toString();
     final basePrice = _asInt(product['priceDa'] ?? product['price'] ?? 0);
+    // Le prix affiché inclut la commission
     final price = basePrice + kCommissionDa;
     final stock = _asInt(product['stock'] ?? 0);
     final imageUrls = product['imageUrls'] as List?;
@@ -489,7 +685,8 @@ class _ProductCard extends ConsumerWidget {
 
     // Check if already in cart
     final cart = ref.watch(cartProvider);
-    final inCart = cart.items.any((item) => item.productId == productId);
+    final cartItem = cart.items.where((item) => item.productId == productId).firstOrNull;
+    final inCart = cartItem != null;
 
     void addToCart() {
       ref.read(cartProvider.notifier).addItem(CartItem(
@@ -568,12 +765,19 @@ class _ProductCard extends ConsumerWidget {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
                         color: Colors.green,
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.check, color: Colors.white, size: 14),
+                      child: Text(
+                        '${cartItem.quantity}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
                   ),
               ],
@@ -582,7 +786,7 @@ class _ProductCard extends ConsumerWidget {
 
           // Info
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
@@ -594,9 +798,21 @@ class _ProductCard extends ConsumerWidget {
                       fontWeight: FontWeight.w700,
                       fontSize: 13,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (description.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 10,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                   const Spacer(),
                   Row(
                     children: [
