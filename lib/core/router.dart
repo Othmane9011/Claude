@@ -26,6 +26,12 @@ import '../features/bookings/my_bookings_screen.dart';
 // Adopt
 import '../features/adopt/adopt_create_screen.dart';
 
+// Petshop client
+import '../features/petshop/cart_screen.dart';
+import '../features/petshop/checkout_screen.dart';
+import '../features/petshop/order_confirmation_screen.dart';
+import '../features/petshop/user_orders_screen.dart';
+
 
 // Pro
 import '../features/pro/pro_shell.dart';
@@ -257,6 +263,30 @@ GoRoute(path: '/admin/commissions', builder: (_, _) => const AdminCommissionsPag
       GoRoute(
         path: '/adopt/new',
         builder: (ctx, st) => const AdoptCreateScreen(),
+      ),
+
+      // -------- Petshop Client --------
+      GoRoute(
+        path: '/cart',
+        builder: (_, _) => const CartScreen(),
+      ),
+      GoRoute(
+        path: '/checkout',
+        builder: (_, _) => const CheckoutScreen(),
+      ),
+      GoRoute(
+        path: '/order-confirmation',
+        builder: (ctx, st) {
+          final extra = (st.extra as Map<String, dynamic>?) ?? {};
+          return OrderConfirmationScreen(
+            orderIds: (extra['orderIds'] as List<String>?) ?? [],
+            total: extra['total'] as int? ?? 0,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/my-orders',
+        builder: (_, _) => const UserOrdersScreen(),
       ),
 
       

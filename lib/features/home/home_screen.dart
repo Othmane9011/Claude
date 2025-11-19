@@ -16,6 +16,7 @@ import '../../core/session_controller.dart';
 import '../../core/api.dart';
 // 👇 pour le bouton "Modifier" (pending)
 import '../bookings/booking_flow_screen.dart';
+import '../petshop/cart_provider.dart';
 
 // ⛔️ Ne pas afficher Annuler/Modifier dans la bannière PENDING du Home
 const bool kShowPendingActionsOnHome = false;
@@ -411,7 +412,7 @@ class HomeScreen extends ConsumerWidget {
 }
 
 /// -------------------- Header --------------------
-class _Header extends StatelessWidget {
+class _Header extends ConsumerWidget {
   const _Header({required this.isPro, required this.name, this.avatarUrl});
   final bool isPro;
   final String name;
@@ -426,12 +427,13 @@ class _Header extends StatelessWidget {
   bool _isHttp(String? s) => s != null && (s.startsWith('http://') || s.startsWith('https://'));
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final coral = const Color(0xFFF36C6C);
     final subtitle = isPro ? null : "Comment va votre compagnon aujourd'hui !";
     final display = isPro ? 'Dr. $name' : name;
 
     final hasAvatar = _isHttp(avatarUrl);
+    final cartCount = ref.watch(cartItemCountProvider);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
@@ -471,6 +473,38 @@ class _Header extends StatelessWidget {
                   ),
               ],
             ),
+          ),
+          // Cart icon with badge
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                onPressed: () => context.push('/cart'),
+                icon: const Icon(Icons.shopping_cart_outlined),
+              ),
+              if (cartCount > 0)
+                Positioned(
+                  right: 4,
+                  top: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: coral,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                    child: Text(
+                      cartCount > 99 ? '99' : '$cartCount',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
           ),
           ValueListenableBuilder<List<_Notif>>(
             valueListenable: NotificationsStore.instance,

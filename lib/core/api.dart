@@ -2043,4 +2043,111 @@ final hay = [
     }
     throw Exception(_extractMessage(last?.response?.data));
   }
+
+  // ========= Client Petshop Orders =========
+
+  /// Créer une commande petshop (client)
+  Future<Map<String, dynamic>> createPetshopOrder({
+    required String providerId,
+    required List<Map<String, dynamic>> items, // [{productId, quantity}]
+    String? deliveryAddress,
+    String? notes,
+  }) async {
+    await ensureAuth();
+    final body = _dropNulls({
+      'providerId': providerId,
+      'items': items,
+      'deliveryAddress': deliveryAddress,
+      'notes': notes,
+    });
+
+    final paths = <String>[
+      '/petshop/orders',
+      '/orders',
+    ];
+    DioException? last;
+    for (final path in paths) {
+      try {
+        final res = await _authRetry(() async => await _dio.post(path, data: body));
+        return _unwrap<Map<String, dynamic>>(res.data);
+      } on DioException catch (e) {
+        last = e;
+        if ((e.response?.statusCode ?? 0) == 404) continue;
+        rethrow;
+      }
+    }
+    throw Exception(_extractMessage(last?.response?.data));
+  }
+
+  /// Liste des commandes du client connecté
+  Future<List<Map<String, dynamic>>> myClientOrders({String? status}) async {
+    await ensureAuth();
+    final paths = <String>[
+      '/me/orders',
+      '/users/me/orders',
+      '/petshop/client/orders',
+    ];
+    DioException? last;
+    final params = <String, dynamic>{if (status != null && status.isNotEmpty) 'status': status};
+    for (final path in paths) {
+      try {
+        final res = await _authRetry(() async => await _dio.get(path, queryParameters: params));
+        final data = _unwrap<List<dynamic>>(res.data, map: (d) => (d as List).cast<dynamic>());
+        return data.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      } on DioException catch (e) {
+        last = e;
+        final code = e.response?.statusCode ?? 0;
+        if (code == 404 || code == 405) continue;
+        rethrow;
+      }
+    }
+    throw Exception(_extractMessage(last?.response?.data));
+  }
+
+  /// Détails d'une commande client
+  Future<Map<String, dynamic>> getClientOrder(String orderId) async {
+    await ensureAuth();
+    final paths = <String>[
+      '/me/orders/$orderId',
+      '/users/me/orders/$orderId',
+      '/orders/$orderId',
+    ];
+    DioException? last;
+    for (final path in paths) {
+      try {
+        final res = await _authRetry(() async => await _dio.get(path));
+        return _unwrap<Map<String, dynamic>>(res.data);
+      } on DioException catch (e) {
+        last = e;
+        final code = e.response?.statusCode ?? 0;
+        if (code == 404) continue;
+        rethrow;
+      }
+    }
+    throw Exception(_extractMessage(last?.response?.data));
+  }
+
+  /// Annuler une commande client (si encore en PENDING)
+  Future<Map<String, dynamic>> cancelClientOrder(String orderId) async {
+    await ensureAuth();
+    final body = {'status': 'CANCELLED'};
+    final paths = <String>[
+      '/me/orders/$orderId/cancel',
+      '/orders/$orderId/cancel',
+      '/orders/$orderId/status',
+    ];
+    DioException? last;
+    for (final path in paths) {
+      try {
+        final res = await _authRetry(() async => await _dio.patch(path, data: body));
+        return _unwrap<Map<String, dynamic>>(res.data);
+      } on DioException catch (e) {
+        last = e;
+        final code = e.response?.statusCode ?? 0;
+        if (code == 404) continue;
+        rethrow;
+      }
+    }
+    throw Exception(_extractMessage(last?.response?.data));
+  }
 }
