@@ -308,11 +308,24 @@ class ApiClient {
           options: Options(headers: requiredHeaders),
         );
 
+        // Confirmer l'upload pour définir l'ACL public-read (OVH)
+        final needsConfirm = (m['needsConfirm'] ?? false) as bool;
+        final key = (m['key'] ?? '') as String;
+        if (needsConfirm && key.isNotEmpty) {
+          try {
+            await _authRetry(
+              () async => await _dio.post('/uploads/confirm', data: {'key': key}),
+            );
+          } catch (e) {
+            // Log mais ne pas faire échouer l'upload
+            debugPrint('Failed to confirm upload ACL: $e');
+          }
+        }
+
         final publicUrl = (m['publicUrl'] ?? m['public_url'] ?? '') as String;
         if (publicUrl.isNotEmpty) return publicUrl;
 
         final bucket = (m['bucket'] ?? '') as String;
-        final key = (m['key'] ?? '') as String;
         final publicBase = const String.fromEnvironment('S3_PUBLIC_ENDPOINT', defaultValue: '');
         if (publicBase.isNotEmpty && bucket.isNotEmpty && key.isNotEmpty) {
           return '${publicBase.replaceAll(RegExp(r'/+$'), '')}/$bucket/$key';

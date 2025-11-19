@@ -9,7 +9,7 @@ import { diskStorage, type StorageEngine } from 'multer';
 import { existsSync, mkdirSync } from 'fs';
 import { extname, join } from 'path';
 import { randomUUID } from 'crypto';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, PutObjectAclCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 @Controller({ path: 'uploads', version: '1' })
@@ -56,16 +56,12 @@ export class UploadsController {
     const cleanExt = (body.ext ?? '').replace(/^\./, '');
     const key = `${folder}/${req.user.sub}/${randomUUID()}${cleanExt ? '.' + cleanExt : ''}`;
 
+    // Presigned URL sans ACL (OVH ne supporte pas bien les ACL dans presigned URLs)
     const putInput: any = {
       Bucket: bucket,
       Key: key,
       ContentType: body.mimeType,
     };
-
-    // Ajoute l’ACL seulement si demandé (et supporté par ton backend S3)
-    if (String(process.env.S3_USE_OBJECT_ACL || '').toLowerCase() === 'true') {
-      putInput.ACL = 'public-read';
-    }
 
     const put = new PutObjectCommand(putInput);
     const url = await getSignedUrl(this.s3, put, { expiresIn: 900 });
@@ -83,14 +79,36 @@ export class UploadsController {
       publicUrl = `${process.env.S3_ENDPOINT.replace(/\/+$/,'')}/${bucket}/${key}`;
     }
 
-    // Headers requis pour l'upload (le client doit les envoyer)
+    // Headers requis pour l'upload
     const requiredHeaders: Record<string, string> = {
       'Content-Type': body.mimeType,
     };
-    if (putInput.ACL) {
-      requiredHeaders['x-amz-acl'] = putInput.ACL;
-    }
 
-    return { url, key, bucket, publicUrl, requiredHeaders };
+    // Indiquer au client s'il doit confirmer l'upload pour ACL
+    const needsConfirm = String(process.env.S3_USE_OBJECT_ACL || '').toLowerCase() === 'true';
+
+    return { url, key, bucket, publicUrl, requiredHeaders, needsConfirm };
+  }
+
+  @Post('confirm')
+  async confirmUpload(
+    @Body() body: { key: string },
+  ) {
+    const bucket = process.env.S3_BUCKET!;
+    const key = body.key;
+
+    // Définir l'ACL public-read sur l'objet uploadé
+    try {
+      await this.s3.send(new PutObjectAclCommand({
+        Bucket: bucket,
+        Key: key,
+        ACL: 'public-read',
+      }));
+      return { success: true, key };
+    } catch (error) {
+      console.error('Error setting ACL:', error);
+      // On ne fait pas échouer l'upload même si l'ACL échoue
+      return { success: false, key, error: 'Failed to set public ACL' };
+    }
   }
 }
