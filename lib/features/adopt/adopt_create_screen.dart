@@ -55,7 +55,7 @@ class _AdoptCreateScreenState extends ConsumerState<AdoptCreateScreen> {
       final api = ref.read(apiProvider);
       final urls = <String>[];
       for (final x in _images) {
-        final url = await api.uploadLocalFile(File(x.path));
+        final url = await api.uploadLocalFile(File(x.path), folder: 'adopt');
         urls.add(url);
       }
 

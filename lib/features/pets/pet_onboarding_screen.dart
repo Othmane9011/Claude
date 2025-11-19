@@ -428,7 +428,7 @@ class _PetOnboardingScreenState extends ConsumerState<PetOnboardingScreen> {
       String? photoUrl = _existingPhotoUrl;
       if (_photoFile != null) {
         try {
-          photoUrl = await api.uploadLocalFile(_photoFile!);
+          photoUrl = await api.uploadLocalFile(_photoFile!, folder: 'pets');
         } catch (_) {
           // on ignore l'erreur d'upload pour ne pas bloquer l'enregistrement
         }

@@ -274,7 +274,9 @@ class ApiClient {
   }
 
   // ====== upload (avatar / photos) ======
-  Future<String> uploadLocalFile(File file) async {
+  /// Upload un fichier vers S3
+  /// [folder] permet d'organiser les fichiers: 'avatars', 'pets', 'adopt', etc.
+  Future<String> uploadLocalFile(File file, {String folder = 'uploads'}) async {
     await ensureAuth();
 
     final filename = file.path.split(Platform.pathSeparator).last;
@@ -286,7 +288,7 @@ class ApiClient {
       final presign = await _authRetry(
         () async => await _dio.post('/uploads/presign', data: {
           'mimeType': mime,
-          'folder': 'uploads',
+          'folder': folder,
           'ext': ext,
         }),
       );
